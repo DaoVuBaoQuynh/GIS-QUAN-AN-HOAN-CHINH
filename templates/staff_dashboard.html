@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Nhân viên</title>
+  <style>
+    body{font-family:Arial;padding:16px}
+    table{border-collapse:collapse;width:100%;margin-bottom:16px}
+    td,th{border:1px solid #ddd;padding:8px}
+    select{padding:6px}
+    button{padding:6px 10px}
+  </style>
+</head>
+<body>
+<h2>Dashboard nhân viên - {{ restaurant.name }}</h2>
+<p><a href="/">← Về bản đồ</a> | <a href="/admin/">Admin</a></p>
+
+<h3>Trạng thái bàn</h3>
+<table>
+  <tr>
+    <th>Bàn</th><th>Số chỗ</th><th>Trạng thái</th><th>Cập nhật</th>
+  </tr>
+  {% for t in tables %}
+  <tr>
+    <td>{{ t.code }}</td>
+    <td>{{ t.seats }}</td>
+    <td>{{ t.get_status_display }}</td>
+    <td>
+      <form method="post" action="/staff/ban/{{ t.id }}/cap-nhat/">
+        {% csrf_token %}
+        <select name="status">
+          <option value="available">Trống</option>
+          <option value="reserved">Đã đặt</option>
+          <option value="occupied">Đang phục vụ</option>
+          <option value="cleaning">Đang dọn</option>
+        </select>
+        <button type="submit">Lưu</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h3>Đặt bàn gần đây</h3>
+<table>
+  <tr>
+    <th>Khách</th><th>SĐT</th><th>Thời gian</th><th>Số khách</th><th>Trạng thái</th>
+  </tr>
+  {% for r in reservations %}
+  <tr>
+    <td>{{ r.customer_name }}</td>
+    <td>{{ r.customer_phone }}</td>
+    <td>{{ r.booking_time }}</td>
+    <td>{{ r.guests }}</td>
+    <td>{{ r.get_status_display }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+</body>
+</html>

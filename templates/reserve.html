@@ -1,0 +1,51 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <link rel="stylesheet" href="{% static 'css/pastel-pink.css' %}">
+  <meta charset="utf-8"/>
+  <title>Đặt bàn</title>
+  <style>
+    body{font-family:Arial;padding:16px}
+    input, select, textarea{width:100%;padding:10px;margin:6px 0}
+    button{padding:10px 14px}
+    .err{color:#c00}
+  </style>
+</head>
+<body>
+<h2>Đặt bàn</h2>
+<p><a href="/">← Về bản đồ</a></p>
+
+{% if error %}
+  <p class="err">{{ error }}</p>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <label><b>Chọn quán</b></label>
+  <select name="restaurant" required>
+    <option value="">-- Chọn quán --</option>
+    {% for r in restaurants %}
+      <option value="{{ r.id }}">{{ r.name }} - {{ r.address }}</option>
+    {% endfor %}
+  </select>
+
+  <label><b>Tên khách</b></label>
+  <input name="customer_name" required>
+
+  <label><b>SĐT</b></label>
+  <input name="customer_phone" required>
+
+  <label><b>Số khách</b></label>
+  <input type="number" name="guests" min="1" value="2" required>
+
+  <label><b>Thời gian</b></label>
+  <input type="datetime-local" name="booking_time" required>
+
+  <label><b>Ghi chú</b></label>
+  <textarea name="note" rows="3"></textarea>
+
+  <button type="submit">Gửi yêu cầu đặt bàn</button>
+</form>
+</body>
+</html>

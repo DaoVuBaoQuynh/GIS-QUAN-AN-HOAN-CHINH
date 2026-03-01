@@ -1,0 +1,357 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <title>Web GIS Quản lý quán ăn</title>
+
+  <!-- CSS pastel hồng -->
+  <link rel="stylesheet" href="{% static 'css/pastel-pink.css' %}">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #fff7fa; }
+
+    header {
+      padding: 14px 20px;
+      background: linear-gradient(90deg, #f7b7cc, #f9d3e0);
+      color: #7a2f4d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    header a {
+      color: #7a2f4d;
+      font-weight: 600;
+      text-decoration: none;
+      margin-left: 12px;
+    }
+    header a:hover { text-decoration: underline; }
+
+    .panel {
+      margin: 16px;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    input, select {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid #f1b7cc;
+      outline: none;
+    }
+    button {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      background: #f59cb8;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #f07aa3;
+      transform: translateY(-1px);
+    }
+    .hint { margin-top: 8px; color: #8a4b63; font-size: 14px; }
+
+    #stats-box {
+      margin: 16px;
+      padding: 16px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    #map {
+      width: 100%;
+      height: 600px;
+      margin: 16px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    /* Legend */
+    #legend {
+      position: absolute;
+      bottom: 30px;
+      right: 20px;
+      background: white;
+      padding: 12px 14px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      font-size: 14px;
+      z-index: 999;
+    }
+    #legend .dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      margin-right: 6px;
+    }
+    .cafe { background: #ff7fb7; }
+    .buffet { background: #a78bfa; }
+    .bun { background: #60a5fa; }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div><b>🌸 GIS Quản lý quán ăn</b></div>
+  <div>
+    <a href="/dat-ban/">Đặt bàn</a>
+    <a href="/staff/">Nhân viên</a>
+    <a href="/admin/">Admin</a>
+  </div>
+</header>
+
+<div class="panel">
+  <div class="row">
+    <input id="q" placeholder="Tìm tên quán..." />
+
+    <select id="category">
+      <option value="">-- Tất cả loại --</option>
+      {% for c in categories %}
+        <option value="{{ c.id }}">{{ c.name }}</option>
+      {% endfor %}
+    </select>
+
+    <input id="radius_km" type="number" min="0" step="0.5"
+           placeholder="Bán kính (km)" style="width:150px"/>
+
+    <button onclick="getMyLocation()">📍 Lấy vị trí tôi</button>
+    <button onclick="loadRestaurants()">🔍 Áp dụng lọc</button>
+  </div>
+
+  <p class="hint">Nhập bán kính → bấm “Lấy vị trí tôi” → “Áp dụng lọc”</p>
+</div>
+
+<div id="stats-box">
+  <h3>📊 Thống kê quán ăn theo loại</h3>
+  <ul id="stats-category">
+    <li>Đang tải dữ liệu...</li>
+  </ul>
+</div>
+
+<div id="legend">
+  <b>Chú thích</b>
+  <div><span class="dot cafe"></span> Cafe</div>
+  <div><span class="dot buffet"></span> Buffet</div>
+  <div><span class="dot bun"></span> Bún/Mì</div>
+</div>
+
+<div id="map"
+     data-lat="{{ center.lat }}"
+     data-lng="{{ center.lng }}"
+     data-zoom="{{ center.zoom }}">
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+/* ===== Stats ===== */
+async function loadStatsCategory() {
+  try {
+    const res = await fetch("/stats/category");
+    const json = await res.json();
+
+    const ul = document.getElementById("stats-category");
+    ul.innerHTML = "";
+
+    if (!json.data || json.data.length === 0) {
+      ul.innerHTML = "<li>Chưa có dữ liệu</li>";
+      return;
+    }
+
+    json.data.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = `${item.category}: ${item.total} quán`;
+      ul.appendChild(li);
+    });
+  } catch (e) {
+    document.getElementById("stats-category").innerHTML = "<li>Lỗi tải thống kê</li>";
+    console.error(e);
+  }
+}
+
+/* ===== Map init ===== */
+const mapDiv = document.getElementById("map");
+const CENTER_LAT = parseFloat(mapDiv.dataset.lat);
+const CENTER_LNG = parseFloat(mapDiv.dataset.lng);
+const CENTER_ZOOM = parseInt(mapDiv.dataset.zoom);
+
+const map = L.map("map").setView([CENTER_LAT, CENTER_LNG], CENTER_ZOOM);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 })
+  .addTo(map);
+
+let markersLayer = L.layerGroup().addTo(map);
+let myMarker = null;
+let myLatLng = null;
+let radiusCircle = null;
+
+/* ===== Circle ===== */
+function drawRadiusCircle() {
+  const radius = parseFloat(document.getElementById("radius_km").value || "0");
+
+  if (radiusCircle) {
+    map.removeLayer(radiusCircle);
+    radiusCircle = null;
+  }
+
+  if (!myLatLng || !radius || radius <= 0) return;
+
+  radiusCircle = L.circle([myLatLng.lat, myLatLng.lng], {
+    radius: radius * 1000,
+    weight: 2,
+    opacity: 0.9,
+    fillOpacity: 0.15
+  }).addTo(map);
+
+  map.fitBounds(radiusCircle.getBounds());
+}
+
+/* ===== Colored marker ===== */
+function categoryColor(categoryName) {
+  const c = (categoryName || "").toLowerCase();
+  if (c.includes("cafe")) return "#ff7fb7";
+  if (c.includes("buffet")) return "#a78bfa";
+  if (c.includes("bún") || c.includes("bun")) return "#60a5fa";
+  if (c.includes("mì") || c.includes("mi")) return "#fb7185";
+  return "#f59cb8";
+}
+
+function markerIcon(color) {
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="
+        width:18px;height:18px;
+        border-radius:999px;
+        background:${color};
+        border:3px solid white;
+        box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+      "></div>
+    `,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
+    popupAnchor: [0, -10]
+  });
+}
+
+/* ===== distance for popup ===== */
+function distanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+/* ===== Load restaurants ===== */
+async function loadRestaurants() {
+  markersLayer.clearLayers();
+
+  let url = "/api/restaurants.geojson";
+  const params = new URLSearchParams();
+
+  const q = document.getElementById("q").value.trim();
+  const category = document.getElementById("category").value;
+  const radius = document.getElementById("radius_km").value;
+
+  if (q) params.set("q", q);
+  if (category) params.set("category", category);
+
+  if (myLatLng && radius) {
+    params.set("lat", myLatLng.lat);
+    params.set("lng", myLatLng.lng);
+    params.set("radius_km", radius);
+  }
+
+  if (params.toString()) url += "?" + params.toString();
+
+  const res = await fetch(url);
+  const geo = await res.json();
+
+  drawRadiusCircle();
+
+  if (!geo.features || geo.features.length === 0) {
+    console.log("Không có quán nào theo bộ lọc:", url);
+    return;
+  }
+
+  geo.features.forEach(f => {
+    const lat = f.geometry.coordinates[1];
+    const lng = f.geometry.coordinates[0];
+    const p = f.properties;
+
+    const color = categoryColor(p.category);
+    const icon = markerIcon(color);
+
+    let distText = "";
+    if (myLatLng) {
+      const d = distanceKm(myLatLng.lat, myLatLng.lng, lat, lng);
+      distText = `<br><b>Cách bạn: ${d.toFixed(2)} km</b>`;
+    }
+
+    const popup = `
+      <b>${p.name}</b><br>
+      ${p.address || ""}<br>
+      Loại: ${p.category || "Chưa phân loại"}<br>
+      Giá: ${p.price_level ?? ""}${distText}
+    `;
+
+    L.marker([lat, lng], { icon })
+      .addTo(markersLayer)
+      .bindPopup(popup);
+  });
+}
+
+/* ===== My location ===== */
+function getMyLocation() {
+  if (!navigator.geolocation) {
+    alert("Trình duyệt không hỗ trợ định vị.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(pos => {
+    myLatLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+
+    if (myMarker) map.removeLayer(myMarker);
+
+    myMarker = L.marker([myLatLng.lat, myLatLng.lng])
+      .addTo(map)
+      .bindPopup("📍 Vị trí của bạn")
+      .openPopup();
+
+    map.setView([myLatLng.lat, myLatLng.lng], 14);
+    drawRadiusCircle();
+  }, err => {
+    alert("Không lấy được vị trí: " + err.message);
+  });
+}
+
+/* ===== Initial load ===== */
+loadRestaurants();
+loadStatsCategory();
+setTimeout(() => map.invalidateSize(), 300);
+</script>
+
+</body>
+</html>
