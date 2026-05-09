@@ -1,0 +1,1719 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang quản lý Admin</title>
+
+    <style>
+        *{ box-sizing:border-box; }
+
+        body{
+            margin:0;
+            font-family:Arial, sans-serif;
+            background:#fdf8fb;
+            color:#5d4953;
+        }
+
+        .app{
+            width:98%;
+            max-width:1700px;
+            margin:20px auto;
+            background:#fffafc;
+            border:2px solid #e8d7df;
+            border-radius:28px;
+            padding:18px;
+            display:grid;
+            grid-template-columns:190px 1fr 300px;
+            gap:18px;
+        }
+
+        .sidebar{
+            background:linear-gradient(180deg,#f8d8e5,#f4bfd4);
+            color:#6b4557;
+            border-radius:24px;
+            padding:18px 14px;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            border:1px solid #efcfe0;
+        }
+
+        .logo{
+            font-size:22px;
+            font-weight:bold;
+            margin-bottom:24px;
+            color:#b65d85;
+        }
+
+        .menu-title{
+            font-size:12px;
+            color:#9d7388;
+            margin:16px 0 10px;
+            text-transform:uppercase;
+            font-weight:bold;
+        }
+
+        .sidebar a{
+            display:block;
+            text-decoration:none;
+            color:#6a4958;
+            padding:10px 12px;
+            border-radius:12px;
+            margin-bottom:8px;
+            font-size:14px;
+            font-weight:600;
+            transition:0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active{
+            background:linear-gradient(90deg,#e79dbf,#d97aa6);
+            color:white;
+            box-shadow:0 8px 18px rgba(213,123,166,0.25);
+        }
+
+        .admin-box{
+            margin-top:30px;
+            border-top:1px solid rgba(182,93,133,0.18);
+            padding-top:14px;
+            color:#7d5a6b;
+            font-size:14px;
+            line-height:1.6;
+        }
+
+        .main{ padding:6px 4px; }
+
+        .top-search{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
+            margin-bottom:16px;
+        }
+
+        .search-box{
+            flex:1;
+            background:#fff4f8;
+            border:1px solid #ecd2de;
+            border-radius:999px;
+            padding:12px 18px;
+            color:#866a77;
+        }
+
+        .top-icons{
+            display:flex;
+            gap:10px;
+            align-items:center;
+        }
+
+        .circle-btn{
+            width:40px;
+            height:40px;
+            border-radius:50%;
+            background:#f6c8d9;
+            color:#7a3e57;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:18px;
+            border:1px solid #f0b6cc;
+            cursor:pointer;
+            text-decoration:none;
+transition:0.3s;
+        }
+
+        .circle-btn:hover{
+            background:#f3b5cb;
+            transform:scale(1.05);
+        }
+
+        .welcome h1{
+            margin:0 0 6px;
+            font-size:36px;
+            color:#38252e;
+        }
+
+        .welcome p{
+            margin:0 0 18px;
+            color:#8e7480;
+            line-height:1.5;
+        }
+
+        .quick-stats{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:14px;
+            margin-bottom:16px;
+        }
+
+        .stat-card{
+            background:white;
+            border:1px solid #efd8e2;
+            border-radius:20px;
+            padding:18px;
+            min-height:120px;
+        }
+
+        .stat-card h4{
+            margin:0 0 10px;
+            color:#5d4953;
+        }
+
+        .stat-card h2{
+            margin:0;
+            font-size:30px;
+            color:#33252d;
+        }
+
+        .stat-card p{
+            margin:8px 0 0;
+            color:#8e7480;
+            font-size:14px;
+        }
+
+        .stat-blue{ border-left:6px solid #8bb8e8; }
+        .stat-green{ border-left:6px solid #8dcc9a; }
+        .stat-yellow{ border-left:6px solid #efc85b; }
+
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:14px;
+            margin-bottom:16px;
+        }
+
+        .card{
+            border-radius:22px;
+            padding:20px;
+            min-height:145px;
+        }
+
+        .yellow{ background:#f3db77; }
+        .pink{ background:#efc0dc; }
+        .green{ background:#b9cf85; }
+        .blue{ background:#bcc9eb; }
+
+        .card h3{
+            margin:0 0 12px;
+            font-size:26px;
+            color:#33252d;
+        }
+
+        .card p{
+            margin:5px 0;
+            color:#3f3238;
+        }
+
+        .section-row{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:16px;
+            margin-top:16px;
+        }
+
+        .panel{
+            background:#fff;
+            border:1px solid #efd8e2;
+            border-radius:20px;
+            padding:18px;
+        }
+
+        .panel h3{
+            margin:0 0 14px;
+            color:#4d3943;
+            font-size:22px;
+        }
+
+        .box-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:12px;
+        }
+
+        .box-header select{
+            border:1px solid #ecd2de;
+            background:#fff8fb;
+            padding:8px 12px;
+            border-radius:999px;
+            color:#6b4557;
+        }
+
+        .menu-summary{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:12px;
+            margin-bottom:18px;
+        }
+
+        .mini-stat{
+            background:#fff8fb;
+            border:1px solid #f0d5e0;
+            border-radius:16px;
+            padding:14px;
+        }
+
+        .mini-stat h4{
+            margin:0 0 8px;
+font-size:14px;
+            color:#7d5a6b;
+        }
+
+        .mini-stat strong{
+            font-size:20px;
+            color:#4d3943;
+        }
+
+        .menu-content{
+            display:grid;
+            grid-template-columns:280px 1fr;
+            gap:16px;
+            align-items:center;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            font-size:14px;
+        }
+
+        th, td{
+            padding:10px;
+            border-bottom:1px solid #f3dce6;
+            text-align:left;
+        }
+
+        th{
+            color:#6b4557;
+            background:#fff4f8;
+        }
+
+        .list-item{
+            padding:12px 0;
+            border-bottom:1px solid #f3dce6;
+        }
+
+        .list-item:last-child{ border-bottom:none; }
+
+        .small-muted{
+            color:#8f7580;
+            font-size:14px;
+        }
+
+        .tag{
+            display:inline-block;
+            padding:6px 10px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:bold;
+            margin-top:6px;
+        }
+
+        .pending{ background:#fff0cc; color:#946200; }
+        .confirmed{ background:#dff4e5; color:#217a46; }
+        .cancelled{ background:#ffe0e4; color:#b33d61; }
+
+        .reservation-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:14px;
+        }
+
+        .reservation-card{
+            background:#fff8fb;
+            border:1px solid #efd8e2;
+            border-radius:18px;
+            padding:16px;
+        }
+
+        .reservation-top{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            margin-bottom:10px;
+        }
+
+        .res-name{
+            font-size:18px;
+            font-weight:bold;
+            color:#5b3d4a;
+        }
+
+        .res-body p{
+            margin:6px 0;
+            color:#735c67;
+        }
+
+        .res-actions{
+            margin-top:12px;
+            display:flex;
+            gap:10px;
+        }
+
+        .approve-btn,
+        .reject-btn{
+            border:none;
+            border-radius:999px;
+            padding:10px 16px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        .approve-btn{
+            background:#dff4e5;
+            color:#217a46;
+        }
+
+        .reject-btn{
+            background:#ffe0e4;
+            color:#b33d61;
+        }
+
+        .rightbar{ padding:6px 0; }
+
+        .calendar-box,
+        .today-box{
+            background:#fff;
+            border:1px solid #efd8e2;
+            border-radius:20px;
+            padding:18px;
+            margin-bottom:16px;
+        }
+
+        .calendar-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:14px;
+            font-weight:bold;
+            color:#4f3945;
+        }
+
+        .mini-calendar{
+            display:grid;
+grid-template-columns:repeat(7,1fr);
+            gap:8px;
+            text-align:center;
+            font-size:13px;
+            color:#7e6672;
+        }
+
+        .mini-calendar div{
+            padding:8px 0;
+            border-radius:12px;
+        }
+
+        .mini-calendar .active-day{
+            background:#efb3d0;
+            color:#4a3040;
+            font-weight:bold;
+        }
+
+        .event-btn,
+        .view-all{
+            width:100%;
+            padding:14px;
+            border:none;
+            border-radius:999px;
+            background:#2d1d25;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+            margin-top:14px;
+        }
+
+        .today-event{
+            padding:12px;
+            border-radius:16px;
+            background:#fff8fb;
+            border:1px dashed #d8bcc8;
+            margin-bottom:12px;
+        }
+
+        .activity-item{
+            padding:12px;
+            background:#fff8fb;
+            border:1px solid #f1d5df;
+            border-radius:16px;
+            margin-bottom:10px;
+font-size:14px;
+
+        }
+
+        @media(max-width:1200px){
+
+            .app{ grid-template-columns:220px 1fr; }
+
+            .rightbar{ grid-column:1 / -1; }
+
+        }
+
+        @media(max-width:900px){
+
+            .app{ grid-template-columns:1fr; }
+
+            .cards,
+
+            .section-row,
+
+            .quick-stats,
+
+            .menu-summary,
+
+            .menu-content,
+
+            .reservation-grid{
+
+                grid-template-columns:1fr;
+
+            }
+
+        }
+
+        .revenue-tabs{
+    display:flex;
+    gap:10px;
+    margin:12px 0 16px;
+}
+
+.tab-btn{
+    border:none;
+    background:#fff4f8;
+    color:#6b4557;
+    border:1px solid #ecd2de;
+    border-radius:999px;
+    padding:9px 16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.tab-btn.active{
+    background:#d97aa6;
+    color:white;
+}
+
+.customer-tabs{
+    display:flex;
+    gap:10px;
+    margin:12px 0 16px;
+}
+
+.customer-tab-btn{
+    border:none;
+    background:#fff4f8;
+    color:#6b4557;
+    border:1px solid #ecd2de;
+    border-radius:999px;
+    padding:9px 16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.customer-tab-btn.active{
+    background:#d97aa6;
+    color:white;
+}
+
+.info-icon{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:17px;
+    height:17px;
+    border-radius:50%;
+    background:#f3d7e3;
+    color:#9d4f75;
+    font-size:12px;
+    font-weight:bold;
+    margin-left:5px;
+    cursor:help;
+}
+
+.menu-tabs{
+    display:flex;
+    gap:10px;
+    margin:12px 0 16px;
+}
+
+.menu-tab{
+    border:none;
+    background:#fff4f8;
+    color:#6b4557;
+    border:1px solid #ecd2de;
+    border-radius:999px;
+    padding:9px 16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.menu-tab.active{
+    background:#d97aa6;
+    color:white;
+}
+
+.menu-content-small{
+    grid-template-columns:260px 1fr;
+}
+
+.menu-chart-wrap{
+    background:#fff8fb;
+    border:1px solid #f0d5e0;
+    border-radius:18px;
+    padding:14px;
+}
+
+.menu-chart-wrap h4,
+.menu-content h4{
+    margin:0 0 12px;
+    color:#5d4953;
+}
+
+.cancel-summary{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+    margin-bottom:16px;
+}
+
+.cancel-card{
+    background:#fff8fb;
+    border:1px solid #f0d5e0;
+    border-radius:18px;
+    padding:16px;
+}
+
+.cancel-card h4{
+    margin:0 0 8px;
+    color:#6b4557;
+}
+
+.cancel-card strong{
+    font-size:26px;
+    color:#3f3238;
+}
+
+.cancel-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.cancel-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#fff;
+    border:1px solid #f3dce6;
+    border-radius:14px;
+    padding:12px 14px;
+}
+
+.cancel-row span:nth-child(2){
+    flex:1;
+}
+
+.cancel-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+}
+
+.cancel-dot.red{ background:#e85d75; }
+.cancel-dot.orange{ background:#f4a261; }
+.cancel-dot.yellow-dot{ background:#e9c46a; }
+
+.staff-summary{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+}
+
+.staff-card{
+    background:#fff8fb;
+    border:1px solid #f0d5e0;
+    border-radius:18px;
+    padding:14px;
+}
+
+.staff-card h4{
+    margin:0 0 8px;
+    color:#6b4557;
+    font-size:14px;
+}
+
+.staff-card strong{
+    font-size:26px;
+    color:#3f3238;
+}
+
+@media(max-width:1200px){
+    .staff-summary{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:700px){
+    .staff-summary{
+        grid-template-columns:1fr;
+    }
+}
+
+.mini-calendar{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:10px;
+    text-align:center;
+    font-size:14px;
+    color:#4f3945;
+}
+
+.mini-calendar div{
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+}
+
+.mini-calendar .day-name{
+    font-weight:bold;
+    color:#7e6672;
+    border-radius:0;
+}
+
+.mini-calendar .active-day{
+    background:#efb3d0;
+    color:#3f2530;
+    font-weight:bold;
+}
+
+.product-tabs{
+    display:flex;
+    gap:10px;
+    margin:14px 0;
+}
+
+.product-tab{
+    border:1px solid #ecd2de;
+    background:#fff4f8;
+    color:#6b4557;
+    border-radius:999px;
+    padding:10px 18px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.product-tab.active{
+    background:#d97aa6;
+    color:white;
+}
+
+.product-toolbar{
+    display:grid;
+    grid-template-columns:2fr repeat(5, 1fr);
+    gap:10px;
+    margin-top:12px;
+}
+
+.product-search,
+.product-toolbar select{
+    border:1px solid #ecd2de;
+    background:#fff8fb;
+    border-radius:12px;
+    padding:11px 12px;
+    color:#6b4557;
+}
+
+.product-actions{
+    margin-top:14px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+}
+
+.add-product-btn,
+.export-btn{
+    border:none;
+    border-radius:999px;
+    padding:10px 18px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.add-product-btn{
+    background:#d97aa6;
+    color:white;
+}
+
+.export-btn{
+    background:#fff4f8;
+    color:#6b4557;
+    border:1px solid #ecd2de;
+}
+
+.dropdown{
+    position:relative;
+}
+
+.dropdown-content{
+    display:none;
+    position:absolute;
+    right:0;
+    top:45px;
+    background:white;
+    min-width:190px;
+    border:1px solid #efd8e2;
+    border-radius:16px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.08);
+    z-index:10;
+    overflow:hidden;
+}
+
+.dropdown-content a{
+    display:block;
+    padding:12px 16px;
+    text-decoration:none;
+    color:#6b4557;
+    font-weight:bold;
+}
+
+.dropdown-content a:hover{
+    background:#fff4f8;
+}
+
+.dropdown:hover .dropdown-content{
+    display:block;
+}
+
+.export-excel-btn{
+    display:inline-block;
+    margin-top:10px;
+    padding:10px 16px;
+    border-radius:999px;
+    background:#d97aa6;
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+    font-size:14px;
+}
+    </style>
+
+</head>
+
+<body>
+
+<div class="app">
+    <aside class="sidebar">
+        <div>
+            <div class="logo">🌸 Admin Dashboard</div>
+            <div class="menu-title">Quản lý</div>
+            <a href="#tong-quan" class="active">📊 Tổng quan</a>
+            <a href="{% url 'hang_hoa' %}">📦 Hàng hoá </a>
+            <a href="{% url 'phong_ban' %}">🍽 Phòng/Bàn</a>
+            <a href="{% url 'nhan_vien' %}">👥 Nhân viên</a>
+            <a href="{% url 'bao_cao' %}">📈 Báo cáo</a>
+
+            <div class="menu-title">Công cụ</div>
+            <a href="/">🗺 Về bản đồ</a>
+            <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+        </div>
+
+        <div class="admin-box">
+            <strong>{{ request.user.username }}</strong><br>
+            Quản trị hệ thống quán ăn
+        </div>
+
+    </aside>
+    <main class="main">
+
+        <div class="top-search">
+            <input class="search-box" type="text" placeholder="Tìm quán ăn, đơn đặt bàn, khách hàng...">
+            <div class="top-icons">
+                <a href="#hoat-dong" class="circle-btn">🔔</a>
+                <a href="{% url 'logout' %}" class="circle-btn">👤</a>
+
+            </div>
+
+        </div>
+
+        <div class="welcome">
+            <h1>Xin chào, Admin</h1>
+            <p>
+                Hôm nay hệ thống có {{ total_recent_reservations }} đơn đặt bàn,
+                {{ total_restaurants }} nhà hàng đang hoạt động và {{ total_tables }} bàn đang được quản lý.
+            </p>
+        </div>
+
+        <div class="quick-stats">
+            <div class="stat-card stat-blue">
+                <h4>Doanh thu hôm nay</h4>
+                <h2>{{ today_revenue|default:"0" }} VNĐ</h2>
+                <p>Thống kê doanh thu trong ngày</p>
+            </div>
+
+            <div class="stat-card stat-green">
+                <h4>Số lượng đơn hôm nay</h4>
+                <h2>{{ today_reservations|length }}</h2>
+                <p>Tổng số đơn đặt bàn hôm nay</p>
+            </div>
+
+            <div class="stat-card stat-yellow">
+                <h4>Tỷ lệ phủ bàn</h4>
+                <h2>{{ table_coverage|default:"0" }}%</h2>
+                <p>{{ occupied_count }}/{{ total_tables }} bàn đang sử dụng</p>
+            </div>
+        </div>
+
+        <div class="cards" id="thong-ke">
+            <div class="card yellow">
+                <h3>Nhà hàng</h3>
+<p><strong>{{ total_restaurants }}</strong> quán đang hoạt động</p>
+                <p>{{ total_categories }} danh mục món ăn</p>
+            </div>
+
+            
+            <div class="card pink">
+                <h3>Đặt bàn</h3>
+                <p><strong>{{ total_recent_reservations }}</strong> đơn trong hệ thống</p>
+                <p>{{ pending_reservations|length }} đơn đang chờ duyệt</p>
+            </div>
+
+            <div class="card green" id="quan-ly-ban">
+                <h3>Tình trạng bàn</h3>
+                <p>Còn trống: {{ available_count }}</p>
+                <p>Đã đặt: {{ reserved_count }}</p>
+                <p>Đang phục vụ: {{ occupied_count }}</p>
+            </div>
+
+            <div class="card blue">
+                <h3>Doanh thu</h3>
+                <p>Tháng {{ current_month }}/{{ current_year }}: {{ monthly_revenue }} VNĐ</p>
+                <p>Năm {{ current_year }}: {{ yearly_revenue }} VNĐ</p>
+            </div>
+        </div>
+
+        <div class="section-row">
+    <section class="panel">
+        <div class="box-header">
+            <div>
+                <h3>Doanh thu thuần</h3>
+                <p class="small-muted">
+                    Tổng doanh thu: <strong>17,073,000 VNĐ</strong>
+                    &nbsp; | &nbsp;
+                    Tổng hoá đơn: <strong>11</strong>
+                </p>
+            </div>
+            <a href="{% url 'export_revenue_excel' %}" class="export-excel-btn">
+    ⬇ Xuất Excel doanh thu
+</a>
+
+            <select id="revenueRange">
+                <option>Hôm nay</option>
+                <option>Hôm qua</option>
+                <option selected>7 ngày qua</option>
+                <option>Tháng này</option>
+                <option>Tháng trước</option>
+            </select>
+        </div>
+
+        <div class="revenue-tabs">
+            <button class="tab-btn active" onclick="changeRevenueMode('hour', this)">Theo giờ</button>
+            <button class="tab-btn" onclick="changeRevenueMode('day', this)">Theo ngày</button>
+            <button class="tab-btn" onclick="changeRevenueMode('weekday', this)">Theo thứ</button>
+        </div>
+
+        <canvas id="revenueBarChart" height="130"></canvas>
+    </section>
+
+    <section class="panel">
+        <div class="box-header">
+            <div>
+                <h3>Lượng khách hàng</h3>
+                <p class="small-muted">
+                    Tổng khách hàng: <strong>44</strong>
+                </p>
+            </div>
+
+            <select id="customerRange">
+                <option>Hôm nay</option>
+                <option>Hôm qua</option>
+                <option selected>7 ngày qua</option>
+                <option>Tháng này</option>
+                <option>Tháng trước</option>
+            </select>
+        </div>
+
+        <div class="customer-tabs">
+            <button class="customer-tab-btn active" onclick="changeCustomerMode('hour', this)">Theo giờ</button>
+            <button class="customer-tab-btn" onclick="changeCustomerMode('day', this)">Theo ngày</button>
+            <button class="customer-tab-btn" onclick="changeCustomerMode('weekday', this)">Theo thứ</button>
+        </div>
+
+        <canvas id="customerLineChart" height="130"></canvas>
+    </section>
+</div>
+
+       <section class="panel" style="margin-top:16px;">
+    <div class="box-header">
+        <h3>Hiệu quả thực đơn</h3>
+
+        <select>
+            <option>Hôm nay</option>
+            <option>Hôm qua</option>
+            <option selected>7 ngày qua</option>
+            <option>Tháng này</option>
+            <option>Tháng trước</option>
+        </select>
+    </div>
+
+    <div class="menu-summary">
+        <div class="mini-stat">
+            <h4>
+                🍽 Giá trị trung bình/món
+                <span class="info-icon" title="Mức chi tiêu trung bình của khách cho mỗi món chính bán riêng lẻ. Giá trị không bao gồm món thêm, combo/buffet và món tính theo giờ">i</span>
+            </h4>
+            <strong>{{ avg_item_value|default:"67,877" }}</strong>
+        </div>
+
+        <div class="mini-stat">
+            <h4>
+                🍲 Giá trị trung bình/đồ ăn
+                <span class="info-icon" title="Mức chi tiêu trung bình của khách cho mỗi món đồ ăn bán riêng lẻ. Giá trị không bao gồm món thêm, combo/buffet và món tính theo giờ">i</span>
+            </h4>
+            <strong>{{ avg_food_value|default:"0" }}</strong>
+        </div>
+
+        <div class="mini-stat">
+            <h4>
+                🥤 Giá trị trung bình/đồ uống
+                <span class="info-icon" title="Mức chi tiêu trung bình của khách cho mỗi món đồ uống bán riêng lẻ. Giá trị không bao gồm món thêm, combo/buffet và món tính theo giờ">i</span>
+            </h4>
+            <strong>{{ avg_drink_value|default:"0" }}</strong>
+        </div>
+    </div>
+
+    <div class="menu-tabs">
+        <button class="menu-tab active" onclick="changeMenuType('group', this)">Theo nhóm</button>
+        <button class="menu-tab" onclick="changeMenuType('type', this)">Theo loại</button>
+    </div>
+
+    <div class="menu-content menu-content-small">
+        <div class="menu-chart-wrap">
+            <h4>Nhóm món</h4>
+            <canvas id="menuChart"></canvas>
+        </div>
+
+        <div>
+            <h4 id="menuDetailTitle">Chi tiết từng nhóm món</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên nhóm món</th>
+                        <th>Số lượng bán</th>
+                        <th>Doanh thu</th>
+                    </tr>
+                </thead>
+
+                <tbody id="menuDetailTable">
+                    <tr>
+                        <td>1</td>
+                        <td>Món khai vị</td>
+                        <td>16</td>
+                        <td>2,000,000 VNĐ</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Súp</td>
+                        <td>15</td>
+                        <td>1,875,000 VNĐ</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+<td>Đồ uống</td>
+                        <td>14</td>
+                        <td>1,750,000 VNĐ</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Tráng miệng</td>
+                        <td>13</td>
+                        <td>1,625,000 VNĐ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="panel" style="margin-top:16px;">
+    <div class="box-header">
+        <h3>Tình trạng huỷ món</h3>
+
+        <select>
+            <option>Hôm nay</option>
+            <option>Hôm qua</option>
+            <option selected>7 ngày qua</option>
+            <option>Tháng này</option>
+            <option>Tháng trước</option>
+        </select>
+    </div>
+
+    <div class="cancel-summary">
+        <div class="cancel-card">
+            <h4>🔴 Món bị huỷ</h4>
+            <strong>{{ cancelled_items|default:"0" }}</strong>
+        </div>
+
+        <div class="cancel-card">
+            <h4>🧾 Hoá đơn bị huỷ</h4>
+            <strong>{{ cancelled_invoices|default:"0" }}</strong>
+        </div>
+    </div>
+
+    <div class="cancel-list">
+        <div class="cancel-row">
+            <span class="cancel-dot red"></span>
+            <span>Huỷ sau báo bếp</span>
+            <strong>{{ cancelled_after_kitchen|default:"0" }} món</strong>
+        </div>
+
+        <div class="cancel-row">
+            <span class="cancel-dot orange"></span>
+            <span>Huỷ sau tạm tính</span>
+            <strong>{{ cancelled_after_checkout|default:"0" }} món</strong>
+        </div>
+
+        <div class="cancel-row">
+            <span class="cancel-dot yellow-dot"></span>
+            <span>Huỷ khi kiểm đồ</span>
+            <strong>{{ cancelled_checking|default:"0" }} món</strong>
+        </div>
+    </div>
+</section>
+
+<section class="panel" id="nhan-vien" style="margin-top:16px;">
+    <div class="box-header">
+        <h3>Theo dõi nhân viên</h3>
+
+        <select>
+            <option>Hôm nay</option>
+            <option>Hôm qua</option>
+            <option selected>7 ngày qua</option>
+            <option>Tháng này</option>
+            <option>Tháng trước</option>
+        </select>
+    </div>
+
+    <div class="staff-summary">
+        <div class="staff-card">
+            <h4>👥 Nhân viên đi làm</h4>
+            <strong>{{ staff_working|default:"7" }}</strong>
+        </div>
+
+        <div class="staff-card">
+            <h4>🏠 Nhân viên nghỉ làm</h4>
+            <strong>{{ staff_absent|default:"0" }}</strong>
+        </div>
+
+        <div class="staff-card">
+            <h4>⏰ Nhân viên đi muộn</h4>
+            <strong>{{ staff_late|default:"1" }}</strong>
+        </div>
+
+        <div class="staff-card">
+            <h4>🚪 Nhân viên về sớm</h4>
+            <strong>{{ staff_leave_early|default:"1" }}</strong>
+        </div>
+
+        <div class="staff-card">
+            <h4>➕ Nhân viên làm thêm</h4>
+            <strong>{{ staff_overtime|default:"2" }}</strong>
+        </div>
+    </div>
+
+    <table style="margin-top:16px;">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Top 5 nhân viên làm nhiều giờ nhất</th>
+                <th>Số giờ làm</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for staff in top_staff_hours %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ staff.name }}</td>
+                    <td>{{ staff.hours }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td>1</td>
+                    <td>Lê Thị Bảo Trân</td>
+                    <td>9 giờ 30 phút</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Nguyễn Thị Hồng Thảo Vân</td>
+                    <td>7 giờ 45 phút</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Nguyễn Minh Loan</td>
+                    <td>6 giờ 33 phút</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Lã Ngọc Anh</td>
+                    <td>6 giờ 15 phút</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Lê Thảo Nguyên</td>
+                    <td>5 giờ 30 phút</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+        <section class="panel" style="margin-top:16px;">
+
+            <h3>Top quán hot nhất</h3>
+
+            {% for r in top_restaurants %}
+
+                <div class="list-item">
+
+                    <strong>{{ forloop.counter }}. {{ r.name }}</strong><br>
+
+                    <span class="small-muted">
+
+                        {{ r.address }}<br>
+
+                        Lượt đặt bàn: {{ r.total_bookings }}
+
+                    </span>
+
+                </div>
+
+            {% empty %}
+
+                <div>Chưa có dữ liệu thống kê.</div>
+
+            {% endfor %}
+
+        </section>
+
+        <section class="panel" id="don-dat-ban" style="margin-top:16px;">
+
+            <h3>Đơn đặt bàn mới</h3>
+
+            <div class="reservation-grid">
+
+                {% for r in latest_reservations %}
+
+                    <div class="reservation-card">
+
+                        <div class="reservation-top">
+
+                            <div>
+
+                                <div class="res-name">{{ r.customer_name }}</div>
+
+                                <div class="small-muted">{{ r.restaurant.name }}</div>
+
+                            </div>
+
+                            {% if r.status == "pending" %}
+
+                                <span class="tag pending">Chờ duyệt</span>
+
+                            {% elif r.status == "confirmed" %}
+                                <span class="tag confirmed">Đã duyệt</span>
+                            {% else %}
+                                <span class="tag cancelled">Từ chối</span>
+
+                            {% endif %}
+
+                        </div>
+
+                        <div class="res-body">
+
+                            <p>👥 {{ r.guests }} khách</p>
+
+                            <p>🪑 {{ r.get_booking_type_display }}</p>
+
+                            <p>⏰ {{ r.booking_time|date:"d/m/Y H:i" }}</p>
+
+                            <p>📞 {{ r.customer_phone }}</p>
+
+                        </div>
+
+                        {% if r.status == "pending" %}
+                            <div class="res-actions">
+                                <button class="approve-btn" onclick="approveReservation ({{ r.id }})">Duyệt</button>
+                                <button class="reject-btn" onclick="rejectReservation ({{ r.id }})">Từ chối</button>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                {% empty %}
+                    <div>Chưa có đơn đặt bàn nào.</div>
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        <div class="section-row">
+
+            <section class="panel" id="nha-hang">
+
+                <h3>Nhà hàng nổi bật</h3>
+
+                {% for restaurant in restaurants|slice:":5" %}
+<div class="list-item">
+
+                        <strong>{{ restaurant.name }}</strong><br>
+
+                        <span class="small-muted">{{ restaurant.address }}</span>
+
+                    </div>
+
+                {% empty %}
+
+                    <div>Chưa có dữ liệu nhà hàng.</div>
+
+                {% endfor %}
+
+            </section>
+
+            <section class="panel">
+
+                <h3>Theo dõi nhân viên</h3>
+
+                <div class="list-item">Nhân viên đi làm: <strong>{{ staff_working|default:"7" }}</strong></div>
+
+                <div class="list-item">Nhân viên nghỉ làm: <strong>{{ staff_absent|default:"0" }}</strong></div>
+
+                <div class="list-item">Nhân viên đi muộn: <strong>{{ staff_late|default:"1" }}</strong></div>
+
+                <div class="list-item">Nhân viên làm thêm: <strong>{{ staff_overtime|default:"2" }}</strong></div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <aside class="rightbar">
+
+        <div class="calendar-box">
+
+            <div class="calendar-head">
+
+                <span>Tháng {{ current_month }}/{{ current_year }}</span>
+
+                <span>📅</span>
+
+            </div>
+
+            <div class="mini-calendar">
+    <div class="day-name">T2</div>
+    <div class="day-name">T3</div>
+    <div class="day-name">T4</div>
+    <div class="day-name">T5</div>
+    <div class="day-name">T6</div>
+    <div class="day-name">T7</div>
+    <div class="day-name">CN</div>
+
+    <div></div>
+    <div></div>
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
+    <div>4</div>
+    <div>5</div>
+
+    <div>6</div>
+    <div>7</div>
+    <div>8</div>
+    <div>9</div>
+    <div>10</div>
+    <div>11</div>
+    <div>12</div>
+
+    <div>13</div>
+    <div>14</div>
+    <div>15</div>
+    <div>16</div>
+    <div>17</div>
+    <div>18</div>
+    <div>19</div>
+
+    <div>20</div>
+    <div>21</div>
+    <div>22</div>
+    <div>23</div>
+    <div class="active-day">24</div>
+    <div>25</div>
+    <div>26</div>
+
+    <div>27</div>
+    <div>28</div>
+    <div>29</div>
+    <div>30</div>
+</div>
+
+            <button class="event-btn">Xem lịch hôm nay</button>
+
+        </div>
+
+        <div class="today-box">
+
+            <h3 style="margin-top:0;">Hoạt động hôm nay</h3>
+
+            {% for r in today_reservations %}
+
+                <div class="today-event">
+
+                    <strong>{{ r.customer_name }}</strong><br>
+
+                    {{ r.restaurant.name }}<br>
+
+                    <span class="small-muted">{{ r.booking_time|date:"H:i" }} - {{ r.get_booking_type_display }}</span>
+
+                </div>
+
+            {% empty %}
+
+                <div>Hôm nay chưa có lịch đặt bàn.</div>
+
+            {% endfor %}
+
+            <a href="#don-dat-ban" style="text-decoration:none;">
+
+                <button class="view-all">Xem tất cả đơn</button>
+
+            </a>
+
+        </div>
+
+        <div class="today-box" id="hoat-dong">
+
+            <h3 style="margin-top:0;">Hoạt động gần đây</h3>
+
+            <div class="activity-item">🛒 Có đơn đặt bàn mới trong hệ thống</div>
+
+            <div class="activity-item">🏪 Nhà hàng đang hoạt động bình thường</div>
+
+            <div class="activity-item">📈 Doanh thu đã được cập nhật</div>
+<div class="activity-item">🍽 Trạng thái bàn đã thay đổi</div>
+
+        </div>
+
+        <div class="today-box">
+
+            <h3 style="margin-top:0;">Doanh thu theo ngày</h3>
+
+            <canvas id="rightRevenueChart" height="160"></canvas>
+
+        </div>
+
+    </aside>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const revenueData = {
+    hour: {
+        labels: ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'],
+        values: [250000,600000,850000,420000,1200000,900000,750000,660000,1300000,1600000,1450000,1750000,2100000,1650000,1200000]
+    },
+    day: {
+        labels: ['18/04','19/04','20/04','21/04','22/04','23/04','24/04'],
+        values: [2200000,3500000,2800000,4100000,3900000,4500000,4007000]
+    },
+    weekday: {
+        labels: ['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ nhật'],
+        values: [33000000,42000000,51000000,17073000]
+    }
+};
+
+let revenueChart = new Chart(document.getElementById('revenueBarChart'), {
+    type: 'bar',
+    data: {
+        labels: revenueData.day.labels,
+        datasets: [{
+            label: 'Doanh thu',
+            data: revenueData.day.values,
+            backgroundColor: '#efb3d0',
+            borderColor: '#d97aa6',
+            borderWidth: 1,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'Doanh thu: ' + context.raw.toLocaleString('vi-VN') + ' VNĐ';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: value => value.toLocaleString('vi-VN') + 'đ'
+                },
+                title: {
+                    display: true,
+                    text: 'Số tiền'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Thời gian'
+                }
+            }
+        }
+    }
+});
+
+function changeRevenueMode(mode, button) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    revenueChart.data.labels = revenueData[mode].labels;
+    revenueChart.data.datasets[0].data = revenueData[mode].values;
+    revenueChart.update();
+}
+
+const customerData = {
+    hour: {
+        labels: ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'],
+        values: [5,1,4,2,6,4,3,5,7,8,9,12,15,14,11]
+    },
+    day: {
+        labels: ['18/04','19/04','20/04','21/04','22/04','23/04','24/04'],
+        values: [22,31,28,35,40,37,44]
+    },
+    weekday: {
+        labels: ['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','Chủ nhật'],
+        values: [26,30,28,35,42,55,48]
+    }
+};
+
+let customerChart = new Chart(document.getElementById('customerLineChart'), {
+    type: 'line',
+    data: {
+        labels: customerData.day.labels,
+        datasets: [{
+            label: 'Lượt khách',
+            data: customerData.day.values,
+borderColor: '#7aa7d9',
+            backgroundColor: 'rgba(122,167,217,0.25)',
+            borderWidth: 3,
+            tension: 0.35,
+            fill: true,
+            pointRadius: 4,
+            pointHoverRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: value => value + ' khách'
+                },
+                title: {
+                    display: true,
+                    text: 'Số lượt khách'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Thời gian'
+                }
+            }
+        }
+    }
+});
+
+function changeCustomerMode(mode, button) {
+    document.querySelectorAll('.customer-tab-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    customerChart.data.labels = customerData[mode].labels;
+    customerChart.data.datasets[0].data = customerData[mode].values;
+    customerChart.update();
+}
+
+new Chart(document.getElementById('menuChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Món khai vị', 'Súp', 'Đồ uống', 'Tráng miệng'],
+        datasets: [{
+            data: [45, 30, 18, 7],
+            backgroundColor: ['#5aa9e6', '#8ac78a', '#f3c66b', '#e98caf'],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+new Chart(document.getElementById('rightRevenueChart'), {
+    type: 'bar',
+    data: {
+        labels: revenueData.day.labels,
+        datasets: [{
+            label: 'Doanh thu',
+            data: revenueData.day.values,
+            backgroundColor: '#efb3d0',
+            borderColor: '#d97aa6',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+function approveReservation(id) {
+    fetch(`/dashboard/admin/reservation/${id}/approve/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) location.reload();
+    });
+}
+
+function rejectReservation(id) {
+    fetch(`/dashboard/admin/reservation/${id}/reject/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) location.reload();
+    });
+}
+
+const menuGroupData = {
+    labels: ['Món khai vị', 'Súp', 'Đồ uống', 'Tráng miệng'],
+    values: [45, 30, 18, 7],
+    rows: [
+        ['1', 'Món khai vị', '16', '2,000,000 VNĐ'],
+        ['2', 'Súp', '15', '1,875,000 VNĐ'],
+        ['3', 'Đồ uống', '14', '1,750,000 VNĐ'],
+        ['4', 'Tráng miệng', '13', '1,625,000 VNĐ']
+    ]
+};
+
+const menuTypeData = {
+    labels: [
+        'Món khai vị',
+        'Món súp',
+        'Món chính',
+        'Món tráng miệng',
+        'Đồ uống',
+        'Combo/Buffet'
+    ],
+    values: [22, 18, 35, 10, 25, 8],
+    rows: [
+        ['1', 'Món khai vị', '22', '2,200,000 VNĐ'],
+        ['2', 'Món súp', '18', '1,800,000 VNĐ'],
+        ['3', 'Món chính', '35', '5,250,000 VNĐ'],
+        ['4', 'Món tráng miệng', '10', '950,000 VNĐ'],
+        ['5', 'Đồ uống', '25', '1,750,000 VNĐ'],
+        ['6', 'Combo/Buffet', '8', '2,400,000 VNĐ']
+    ]
+};
+
+let menuChart = new Chart(document.getElementById('menuChart'), {
+    type: 'doughnut',
+    data: {
+        labels: menuGroupData.labels,
+        datasets: [{
+            data: menuGroupData.values,
+            backgroundColor: ['#5aa9e6', '#8ac78a', '#f3c66b', '#e98caf'],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive:true,
+        maintainAspectRatio:true,
+        plugins:{
+            legend:{
+                position:'bottom'
+            }
+        }
+    }
+});
+
+function changeMenuType(type, button){
+    document.querySelectorAll('.menu-tab').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    const data = type === 'group' ? menuGroupData : menuTypeData;
+
+    document.getElementById('menuDetailTitle').innerText =
+        type === 'group' ? 'Chi tiết từng nhóm món' : 'Chi tiết từng loại món';
+
+    menuChart.data.labels = data.labels;
+    menuChart.data.datasets[0].data = data.values;
+    menuChart.update();
+
+    const tbody = document.getElementById('menuDetailTable');
+    tbody.innerHTML = data.rows.map(row => `
+        <tr>
+            <td>${row[0]}</td>
+            <td>${row[1]}</td>
+            <td>${row[2]}</td>
+            <td>${row[3]}</td>
+        </tr>
+    `).join('');
+}
+</script>
+
+</body>
+</html>

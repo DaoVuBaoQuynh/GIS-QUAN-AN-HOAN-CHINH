@@ -1,0 +1,928 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý phòng/bàn</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#fdf8fb;color:#4d3943}
+
+.app{
+    width:96%;
+    max-width:1500px;
+    margin:24px auto;
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:20px;
+}
+
+.sidebar{
+    background:linear-gradient(180deg,#f8d8e5,#f4bfd4);
+    border-radius:26px;
+    padding:22px 16px;
+    min-height:90vh;
+    border:1px solid #efcfe0;
+}
+
+.logo{font-size:24px;font-weight:bold;color:#b65d85;margin-bottom:28px}
+.menu-title{font-size:13px;font-weight:bold;color:#9d7388;margin:18px 0 10px;text-transform:uppercase}
+
+.sidebar a{
+    display:block;
+    text-decoration:none;
+    color:#6a4958;
+    padding:12px 14px;
+    border-radius:14px;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+.sidebar a:hover,.sidebar a.active{
+    background:linear-gradient(90deg,#e79dbf,#d97aa6);
+    color:white;
+}
+
+.main{
+    background:#fffafc;
+    border:2px solid #e8d7df;
+    border-radius:28px;
+    padding:24px;
+}
+
+.page-head h1{margin:0;font-size:36px;color:#33252d}
+.page-head p{margin:8px 0 0;color:#8f7580}
+.stat-row{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:14px;
+    margin:16px 0;
+}
+
+.stat-card{
+    background:#fff4f8;
+    border:1px solid #efd8e2;
+    border-radius:18px;
+    padding:16px;
+}
+
+.stat-card b{font-size:24px;color:#b5547f}
+.tabs{
+    display:flex;
+    gap:10px;
+    margin:18px 0;
+}
+
+.tab{
+    border:none;
+    padding:11px 20px;
+    border-radius:999px;
+    background:#fff4f8;
+    color:#6b4557;
+    font-weight:bold;
+    border:1px solid #ecd2de;
+    cursor:pointer;
+}
+
+.tab.active{
+
+    background:#d97aa6;
+
+    color:white;
+
+}
+
+.panel{
+
+    background:white;
+
+    border:1px solid #efd8e2;
+
+    border-radius:22px;
+
+    padding:20px;
+
+    box-shadow:0 8px 24px rgba(213,123,166,0.08);
+
+}
+
+.toolbar{
+
+    display:grid;
+
+    grid-template-columns:1.5fr 1fr 1fr 1fr 1fr auto;
+
+    gap:12px;
+
+    margin-bottom:16px;
+
+}
+
+input,select{
+
+    width:100%;
+
+    padding:12px 14px;
+
+    border-radius:14px;
+
+    border:1px solid #ecd2de;
+
+    background:#fff8fb;
+
+    color:#6b4557;
+
+    outline:none;
+
+}
+
+.actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:10px;
+
+    margin-bottom:16px;
+
+    flex-wrap:wrap;
+
+}
+
+.btn,.action-btn{
+
+    border:none;
+
+    border-radius:999px;
+
+    padding:10px 14px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    text-decoration:none;
+
+    display:inline-block;
+
+    font-size:13px;
+
+}
+
+.btn-add{background:#d97aa6;color:white}
+
+.btn-export{background:#fff4f8;color:#6b4557;border:1px solid #ecd2de}
+
+.delete-btn{background:#ffe0e4;color:#b33d61}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    border-radius:16px;
+
+    overflow:hidden;
+
+}
+
+th{
+
+    background:#fff4f8;
+
+    color:#6b4557;
+
+    padding:14px;
+
+    text-align:left;
+font-size:14px;
+
+}
+
+td{
+
+    padding:14px;
+
+    border-bottom:1px solid #f3dce6;
+
+    font-size:14px;
+
+    vertical-align:top;
+
+}
+
+tr:hover{background:#fff8fb}
+
+.tag{
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+    display:inline-block;
+
+}
+
+.ok{background:#dff4e5;color:#217a46}
+
+.warning{background:#fff0cc;color:#946200}
+
+.danger{background:#ffe0e4;color:#b33d61}
+
+.purple{background:#eadcff;color:#6b3fb3}
+
+/* SƠ ĐỒ BÀN */
+
+
+
+#tableInfo h2{
+
+    margin-top:0;
+
+    margin-bottom:10px;
+
+    font-size:20px;
+
+    color:#d97aa6;
+
+}
+
+#tableInfo p{
+
+    margin:6px 0;
+
+    font-size:14px;
+
+}
+
+.timeline{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.timeline-item{
+
+    padding:10px;
+
+    background:#fff7fa;
+
+    border-radius:10px;
+
+    font-size:13px;
+
+    border-left:4px solid #d97aa6;
+
+}
+
+#tableInfo::-webkit-scrollbar{width:6px}
+
+#tableInfo::-webkit-scrollbar-thumb{
+
+    background:#efbdd2;
+
+    border-radius:20px;
+
+}
+
+/* MODAL */
+
+.modal-overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(60,30,45,0.35);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:9999;
+
+}
+
+.modal-box{
+
+    width:92%;
+
+    max-width:620px;
+
+    background:#fffafc;
+
+    border-radius:26px;
+
+    padding:24px;
+
+    border:1px solid #efd8e2;
+
+    box-shadow:0 24px 60px rgba(120,60,90,0.25);
+
+}
+
+.modal-head{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.modal-head h2{margin:0;color:#b5547f}
+
+.close-modal{
+
+    border:none;
+
+    width:36px;
+
+    height:36px;
+
+    border-radius:50%;
+
+    background:#f1bdd0;
+
+    color:white;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:14px;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    margin-bottom:6px;
+
+    color:#8f6276;
+
+}
+
+.full{grid-column:1 / -1}
+
+.save-modal{
+    width:100%;
+    margin-top:18px;
+    padding:14px;
+    border:none;
+    border-radius:999px;
+    background:#d97aa6;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+@media(max-width:1000px){
+.app{grid-template-columns:1fr}
+
+    .stat-row,.toolbar,.form-grid{grid-template-columns:1fr}
+
+}
+
+.slot-table{
+    width:100%;
+    overflow-x:auto;
+}
+
+.slot-grid{
+    border-collapse:separate;
+    width:100%;
+}
+
+.slot-grid th{
+    background:#fff4f8;
+    color:#6b4557;
+    padding:10px;
+    font-size:12px;
+    white-space: nowrap;
+}
+
+.slot-grid td{
+    padding:6px;
+}
+
+.slot-restaurant{
+    min-width:170px;
+    background:#fff7fa;
+    border-radius:14px;
+    padding:12px;
+    font-weight:bold;
+    color:#6b4557;
+}
+
+.slot-cell{
+    width:70px;
+    min-width:70px;
+    height:70px;
+    text-align: center;;
+    vertical-align:middle;
+}
+
+.slot-booked{
+    background:#fff0f6;
+    border:1px solid #efbdd2;
+    border-radius:10px;
+    padding:4px;
+    min-height:52px;
+    font-size:10px;
+    line-height: 1.3;
+}
+
+.slot-empty{
+    background:#f8fff9;
+    border:1px dashed #cfe9d5;
+    border-radius:10px;
+    padding: 4px;
+    min-height:52px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#7f9b88;
+    font-size:10px;
+}
+
+.approve-mini{
+    margin-top:6px;
+    background:#d97aa6;
+    color:white;
+    border:none;
+    border-radius:999px;
+    padding:6px 10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+    <aside class="sidebar">
+        <div class="logo">🌸 Admin Dashboard</div>
+        <div class="menu-title">Quản lý</div>
+        <a href="{% url 'admin_dashboard' %}">📊 Tổng quan</a>
+        <a href="{% url 'hang_hoa' %}">📦 Hàng hoá</a>
+        <a href="{% url 'phong_ban' %}" class="active">🍽 Phòng/Bàn</a>
+        <a href="{% url 'nhan_vien' %}">👥 Nhân viên</a>
+        <a href="{% url 'bao_cao' %}">📈 Báo cáo</a>
+        <div class="menu-title">Công cụ</div>
+        <a href="/">🗺 Về bản đồ</a>
+        <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+    </aside>
+
+    <main class="main">
+        <div class="page-head">
+            <h1>Quản lý phòng/bàn</h1>
+            <p>Quản lý bàn, trạng thái bàn và lịch đặt bàn theo ngày - khung giờ.</p>
+        </div>
+
+        <div class="stat-row">
+            <div class="stat-card"><span>Tổng bàn</span><br><b>{{ total_tables }}</b></div>
+            <div class="stat-card"><span>Bàn trống</span><br><b>{{ available_tables }}</b></div>
+            <div class="stat-card"><span>Đã đặt</span><br><b>{{ reserved_tables }}</b></div>
+            <div class="stat-card"><span>Đang dùng</span><br><b>{{ occupied_tables }}</b></div>
+            <div class="stat-card"><span>Đang dọn</span><br><b>{{ cleaning_tables }}</b></div>
+        </div>
+
+        <div class="tabs">
+            <button type="button" class="tab active" onclick="showTab('tableTab', this)">Danh sách bàn</button>
+            <button type="button" class="tab" onclick="showTab('bookingTab', this)">Lịch đặt bàn</button>
+        </div>
+
+        <section class="panel" id="tableTab">
+            <h2>Danh sách bàn</h2>
+            <form method="GET" class="toolbar">
+                <input type="text" name="q" placeholder="Tìm người đặt..." value="{{ request.GET.q }}">
+                <input type="date" name="date" value="{{ selected_date|default:'' }}">
+                <select name="restaurant">
+                    <option value="">Tất cả nhà hàng</option>
+                    {% for r in restaurants %}
+                        <option value="{{ r.id }}">{{ r.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="table_type">
+                    <option value="">Tất cả loại bàn</option>
+                    <option value="normal">Bàn thường</option>
+                    <option value="vip">Bàn VIP</option>
+                </select>
+
+                <select name="status">
+                    <option value="">Tất cả đơn</option>
+                    <option value="pending">Chờ duyệt</option>
+                    <option value="confirmed">Đã duyệt</option>
+                    <option value="cancelled">Từ chối</option>
+                </select>
+
+                <button class="btn btn-add" type="submit">Lọc</button>
+
+            </form>
+            <div class="actions">
+                <button type="button" class="btn btn-add" onclick="openTableModal()">+ Thêm bàn</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã bàn</th>
+                        <th>Nhà hàng</th>
+                        <th>Loại bàn</th>
+                        <th>Sức chứa</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in tables %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ t.code }}</td>
+                        <td>{{ t.restaurant.name }}</td>
+                        <td>{{ t.get_table_type_display }}</td>
+                        <td>{{ t.capacity }} khách</td>
+                        <td>
+                            {% if t.status == "available" %}
+                                <span class="tag ok">Trống</span>
+                            {% elif t.status == "reserved" %}
+                                <span class="tag warning">Đã đặt</span>
+                            {% elif t.status == "occupied" %}
+                                <span class="tag purple">Đang dùng</span>
+                            {% else %}
+                                <span class="tag danger">Đang dọn</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <button type="button" class="action-btn btn-export"
+                                onclick="editTable(
+                                    '{{ t.id }}',
+                                    '{{ t.code|escapejs }}',
+                                    '{{ t.restaurant.id }}',
+                                    '{{ t.table_type }}',
+                                    '{{ t.capacity }}',
+                                    '{{ t.status }}'
+                                )">
+                                Sửa
+                            </button>
+
+                            <a class="action-btn btn-export" href="{% url 'change_table_status' t.id 'available' %}">Trống</a>
+                            <a class="action-btn btn-export" href="{% url 'change_table_status' t.id 'reserved' %}">Đặt</a>
+                            <a class="action-btn btn-export" href="{% url 'change_table_status' t.id 'occupied' %}">Dùng</a>
+                            <a class="action-btn delete-btn"
+                               href="{% url 'delete_table' t.id %}"
+                               onclick="return confirm('Xoá bàn này?')">
+                                Xoá
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7">Chưa có bàn nào.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel" id="bookingTab" style="display:none;">
+           <h2>Lịch đặt bàn</h2>
+
+    <form method="GET" class="toolbar">
+        <input type="text" name="q" placeholder="Tìm tên người đặt..." value="{{ request.GET.q }}">
+        <input type="date" name="date" value="{{ selected_date }}">
+
+        <select name="restaurant">
+            <option value="">Tất cả nhà hàng</option>
+            {% for r in restaurants %}
+                <option value="{{ r.id }}">{{ r.name }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="status">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Chờ duyệt</option>
+            <option value="confirmed">Đã duyệt</option>
+            <option value="cancelled">Huỷ bàn</option>
+        </select>
+
+        <button class="btn btn-add" type="submit">Lọc</button>
+    </form>
+
+    <h3>Tất cả đơn đặt bàn</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Ngày</th>
+                <th>Giờ</th>
+                <th>Người đặt</th>
+                <th>SĐT</th>
+                <th>Quán</th>
+                <th>Số khách</th>
+                <th>Loại bàn</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for r in reservations %}
+            <tr>
+                <td>{{ r.booking_time|date:"d/m/Y" }}</td>
+                <td>{{ r.booking_time|date:"H:i" }}</td>
+                <td>{{ r.customer_name }}</td>
+                <td>{{ r.customer_phone }}</td>
+                <td>{{ r.restaurant.name }}</td>
+                <td>{{ r.guests }}</td>
+                <td>{{ r.get_booking_type_display }}</td>
+                <td>
+                    {% if r.status == "pending" %}
+                        <span class="tag warning">Chờ duyệt</span>
+                    {% elif r.status == "confirmed" %}
+                        <span class="tag ok">Đã duyệt</span>
+                    {% elif r.status == "cancelled" %}
+                        <span class="tag danger">Huỷ bàn</span>
+                    {% else %}
+                        <span class="tag danger">{{ r.status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if r.status == "pending" %}
+                        <form method="POST" action="{% url 'approve_booking_from_table' r.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="approve-mini">Duyệt bàn</button>
+                        </form>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9">Chưa có đơn đặt bàn nào.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+<h3>Khung giờ đã được duyệt</h3>
+
+<div class="slot-table">
+    <table class="slot-grid">
+
+        <thead>
+            <tr>
+                <th class="slot-restaurant">Quán</th>
+
+                {% for time in time_slots %}
+                    <th>{{ time }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for row in slot_rows %}
+
+            <tr>
+
+                <td class="slot-restaurant">
+                    {{ row.restaurant.name }}
+                </td>
+
+                {% for item in row.slots %}
+
+                <td class="slot-cell">
+
+                    {% if item.bookings %}
+
+                        {% for b in item.bookings %}
+
+                            {% if b.status == "confirmed" %}
+
+                                <div class="slot-booked">
+
+                                    ✅<br>
+
+                                    <b>{{ b.customer_name }}</b><br>
+
+                                    {{ b.booking_time|date:"H:i" }}
+
+                                </div>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="slot-empty">
+                            Trống
+                        </div>
+
+                    {% endif %}
+
+                </td>
+
+                {% endfor %}
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+                <td colspan="30">
+                    Chưa có dữ liệu.
+                </td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+</div>
+</section>
+
+    </main>
+
+</div>
+
+<div id="tableModal" class="modal-overlay">
+
+    <div class="modal-box">
+
+        <div class="modal-head">
+
+            <h2 id="modalTitle">Thêm bàn</h2>
+<button type="button" class="close-modal" onclick="closeTableModal()">✕</button>
+
+        </div>
+
+        <form method="POST" action="{% url 'save_table' %}">
+
+            {% csrf_token %}
+
+            <input type="hidden" name="table_id" id="table_id">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Mã bàn</label>
+
+                    <input type="text" name="code" id="code" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Nhà hàng</label>
+
+                    <select name="restaurant" id="restaurant" required>
+
+                        {% for r in restaurants %}
+
+                            <option value="{{ r.id }}">{{ r.name }}</option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Loại bàn</label>
+
+                    <select name="table_type" id="table_type">
+
+                        <option value="normal">Bàn thường</option>
+
+                        <option value="vip">Bàn VIP</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Sức chứa</label>
+
+                    <input type="number" name="capacity" id="capacity" min="1" value="4">
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label>Trạng thái</label>
+
+                    <select name="status" id="status">
+
+                        <option value="available">Trống</option>
+
+                        <option value="reserved">Đã đặt</option>
+
+                        <option value="occupied">Đang dùng</option>
+
+                        <option value="cleaning">Đang dọn</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <button type="submit" class="save-modal">Lưu bàn</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+
+function showTab(tabId, btn){
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tableTab").style.display = "none";
+    document.getElementById("bookingTab").style.display = "none";
+    document.getElementById(tabId).style.display = "block";
+}
+
+function openTableModal(){
+    document.getElementById("modalTitle").innerText = "Thêm bàn";
+    document.getElementById("table_id").value = "";
+    document.getElementById("code").value = "";
+    document.getElementById("table_type").value = "normal";
+    document.getElementById("capacity").value = 4;
+    document.getElementById("status").value = "available";
+    document.getElementById("tableModal").style.display = "flex";
+}
+
+function closeTableModal(){
+    document.getElementById("tableModal").style.display = "none";
+}
+
+function editTable(id, code, restaurant, tableType, capacity, status){
+    document.getElementById("modalTitle").innerText = "Sửa bàn";
+    document.getElementById("table_id").value = id;
+    document.getElementById("code").value = code;
+    document.getElementById("restaurant").value = restaurant;
+    document.getElementById("table_type").value = tableType;
+    document.getElementById("capacity").value = capacity;
+    document.getElementById("status").value = status;
+    document.getElementById("tableModal").style.display = "flex";
+}
+
+function showTableInfo(code, status, timelineHtml){
+    const box = document.getElementById("tableInfo");
+    box.style.display = "block";
+    box.innerHTML = `
+        <h2>${code}</h2>
+        <p><b>Trạng thái:</b> ${status}</p>
+        <div class="timeline">
+            ${timelineHtml.trim() || "<div class='timeline-item'>Chưa có lịch đặt.</div>"}
+        </div>
+    `;
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Đăng nhập Khách</title>
+  <link rel="stylesheet" href="{% static 'css/pastel-pink.css' %}">
+
+  <style>
+    *{ box-sizing:border-box; }
+
+    body{
+      font-family: Arial, sans-serif;
+      background:#fff7fa;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      margin:0;
+    }
+
+    .login-box{
+      width:380px;
+      background:white;
+      padding:28px;
+      border-radius:20px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.08);
+    }
+
+    h2{
+      text-align:center;
+      color:#c75b8c;
+      margin-bottom:20px;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      margin-bottom:12px;
+      border:1px solid #f0bfd1;
+      border-radius:12px;
+      outline:none;
+    }
+
+    input:focus{
+      border-color:#e889b0;
+      box-shadow:0 0 0 3px rgba(232,137,176,0.2);
+    }
+
+    .password-box{
+  position:relative;
+  width:100%;
+  height:48px;
+  margin-bottom:12px;
+}
+
+.password-box input{
+  width:100%;
+  height:48px;
+  padding:12px 48px 12px 12px;
+  border:1px solid #f0bfd1;
+  border-radius:12px;
+  outline:none;
+}
+
+.password-box button{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  width:28px;
+  height:28px;
+  padding:0;
+  margin:0;
+  border:none;
+  background:transparent;
+  color:#c75b8c;
+  font-size:18px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+    .login-btn{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:12px;
+      background:#e889b0;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    .login-btn:hover{
+      background:#d96f9e;
+    }
+
+    .error{
+      color:#d63031;
+      background:#ffe6ec;
+      padding:10px;
+      border-radius:12px;
+      margin-bottom:12px;
+      font-size:14px;
+    }
+
+    .links{
+      text-align:center;
+      margin-top:14px;
+    }
+
+    .links a{
+      color:#c75b8c;
+      text-decoration:none;
+      margin:0 8px;
+      font-weight:600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-box">
+    <h2>💖 Đăng nhập Khách</h2>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <input type="text" name="username" placeholder="Tên đăng nhập" required>
+
+      <div class="password-box">
+        <input type="password" name="password" id="password" placeholder="Mật khẩu" required>
+        <button type="button" onclick="togglePassword('password', this)">👁</button>
+      </div>
+
+      <button class="login-btn" type="submit">Đăng nhập</button>
+    </form>
+
+    <div class="links">
+      <a href="{% url 'register' %}">Đăng ký</a>
+      <a href="{% url 'admin_login' %}">Admin</a>
+      <a href="{% url 'staff_login' %}">Staff</a>
+    </div>
+  </div>
+<script>
+    function togglePassword(inputId, btn){
+      const input = document.getElementById(inputId);
+
+      if(input.type === "password"){
+        input.type = "text";
+        btn.textContent = "🙈";
+      }else{
+        input.type = "password";
+        btn.textContent = "👁";
+      }
+    }
+  </script>
+</body>
+</html>

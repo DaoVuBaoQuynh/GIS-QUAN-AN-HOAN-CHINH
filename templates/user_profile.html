@@ -1,0 +1,629 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Trang cá nhân khách hàng</title>
+
+<style>
+*{ box-sizing:border-box; }
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#f3a6c2,#f6b6cd,#f2a2bf,#f6b1c9);
+    min-height:100vh;
+    color:#4a3a42;
+}
+
+.page{
+    width:95%;
+    max-width:1300px;
+    margin:24px auto;
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:24px;
+}
+
+.glass-card{
+    background:#fff5f8;
+    border:1px solid #f0c6d5;
+    border-radius:30px;
+    box-shadow:0 12px 30px rgba(200,120,150,0.2);
+    padding:28px;
+}
+
+.profile-box,
+.right-box{
+    min-height:760px;
+}
+
+.back-link{
+    text-decoration:none;
+    color:white;
+    font-size:28px;
+    display:inline-block;
+    margin-bottom:18px;
+}
+
+.title{
+    font-size:44px;
+    font-weight:bold;
+    margin:0 0 22px;
+    color:#b5547f;
+}
+
+.avatar-wrap{
+    display:flex;
+    justify-content:center;
+    margin:18px 0 26px;
+}
+
+.avatar{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    background:rgba(255,232,239,0.9);
+    border:6px solid rgba(255,255,255,0.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:60px;
+    position:relative;
+    color:#c06b8e;
+    overflow:hidden;
+}
+
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+}
+
+.edit-badge{
+    position:absolute;
+    right:2px;
+    bottom:8px;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#e88eb3;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    border:3px solid white;
+    cursor:pointer;
+}
+
+.info-label{
+    font-size:13px;
+    margin-top:18px;
+    margin-bottom:8px;
+    color:#777;
+}
+
+.info-line{
+    border-bottom:1px solid #e6b6c7;
+    padding:6px 0;
+    font-size:15px;
+    background:transparent;
+    margin-bottom:20px;
+}
+
+.profile-buttons{
+    margin-top:40px;
+    display:flex;
+    gap:10px;
+}
+
+.logout-btn,
+.map-btn{
+    flex:1;
+    text-decoration:none;
+    text-align:center;
+    border:none;
+    border-radius:20px;
+    padding:12px;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    color:white;
+}
+
+.map-btn{
+    background:#e5779e;
+}
+
+.logout-btn{
+    background:#d46a8e;
+}
+
+.section-title{
+    font-size:36px;
+    font-weight:bold;
+    margin:0 0 20px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:24px;
+}
+
+.stat-card{
+    background:#ffe8f0;
+    border:1px solid #f3b7cd;
+    border-radius:22px;
+    padding:18px;
+}
+
+.stat-card h4{
+    margin:0 0 10px;
+    font-size:16px;
+}
+
+.stat-value{
+    font-size:32px;
+    font-weight:bold;
+}
+
+.notify-box,
+.history-box{
+    background:rgba(255,242,246,0.55);
+    border:1px solid rgba(255,255,255,0.32);
+    border-radius:24px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.notify-item,
+.history-item{
+    padding:14px 0;
+border-bottom:1px solid rgba(255,255,255,0.6);
+}
+
+.notify-item:last-child,
+.history-item:last-child{
+    border-bottom:none;
+}
+
+.history-name{
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.muted{
+    line-height:1.7;
+    font-size:15px;
+    color:#7a5b68;
+}
+
+.status{
+    display:inline-block;
+    margin-top:8px;
+    padding:7px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.status-pending{
+    background:#fff1c8;
+    color:#8d6800;
+}
+
+.status-confirmed{
+    background:#daf5df;
+    color:#227548;
+}
+
+.status-cancelled{
+    background:#ffdce4;
+    color:#b23c60;
+}
+
+.success-box,
+.error-box{
+    padding:12px 16px;
+    border-radius:16px;
+    margin-bottom:16px;
+    font-weight:600;
+}
+
+.success-box{
+    background:#ffe7f0;
+    color:#b5547f;
+    border:1px solid #efbfd2;
+}
+
+.error-box{
+    background:#ffe0e4;
+    color:#b23c60;
+    border:1px solid #f0a8ba;
+}
+
+/* POPUP */
+.popup-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(80,40,60,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+}
+
+.popup-box{
+    width:90%;
+    max-width:460px;
+    background:#fff7fa;
+    border-radius:26px;
+    padding:24px;
+    box-shadow:0 20px 40px rgba(191,108,145,0.22);
+    border:1px solid #f1c7d8;
+}
+
+.popup-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.popup-header h3{
+    margin:0;
+    color:#b5547f;
+    font-size:26px;
+}
+
+.close-btn{
+    border:none;
+    background:#f4bfd1;
+    color:white;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.popup-group{
+    margin-bottom:16px;
+}
+
+.popup-group label{
+    display:block;
+    font-size:14px;
+    margin-bottom:6px;
+    color:#8f6276;
+    font-weight:600;
+}
+
+.popup-group input{
+    width:100%;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid #efc6d6;
+    outline:none;
+    background:#fff;
+    font-size:15px;
+}
+
+.popup-group input:focus{
+    border:1px solid #d97aa6;
+    box-shadow:0 0 0 3px rgba(217,122,166,0.12);
+}
+
+.password-box{
+    display:flex;
+    align-items:center;
+    border-bottom:1px solid #e6b6c7;
+    padding:6px 0;
+}
+
+.password-box input{
+    flex:1;
+    border:none;
+    background:transparent;
+    font-size:15px;
+    outline:none;
+}
+
+.password-box button{
+    border:none;
+    background:none;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.password-box{
+    display:flex;
+    align-items:center;
+    border:1px solid #efc6d6;
+    border-radius:14px;
+    padding:0 10px;
+    background:#fff;
+}
+
+.password-box input{
+    flex:1;
+    border:none;
+    padding:12px;
+    outline:none;
+    background:transparent;
+}
+
+.eye-btn{
+    border:none;
+    background:none;
+    cursor:pointer;
+    font-size:16px;
+}
+
+
+
+.popup-save-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:999px;
+    background:#d46a8e;
+    color:white;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+    margin-top:8px;
+}
+
+.popup-save-btn:hover{
+    background:#bf5477;
+}
+
+@media(max-width:992px){
+    .page{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .title,
+    .section-title{
+        font-size:32px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+<section class="glass-card profile-box">
+        <a href="/" class="back-link">‹</a>
+
+        <h1 class="title">Hồ sơ cá nhân</h1>
+
+        <div class="avatar-wrap">
+            <div class="avatar">
+                 {% if profile_obj.avatar %}
+                     <img src="{{ profile_obj.avatar.url }}" alt="Avatar">
+                 {% else %}
+                     👤
+                 {% endif %}
+
+                 <button type="button" class="edit-badge" onclick="openEditPopup()">✎</button>
+            </div>
+        </div>
+    
+
+        <div class="info-label">Tên đăng nhập</div>
+        <div class="info-line">{{ request.user.username }}</div>
+
+        <div class="info-label">Họ và tên</div>
+        <div class="info-line">
+            {{ request.user.first_name|default:"Chưa cập nhật" }}
+            {{ request.user.last_name }}
+        </div>
+
+        <div class="info-label">Email</div>
+        <div class="info-line">
+            {{ request.user.email|default:"Chưa cập nhật" }}
+        </div>
+
+        <div class="info-label">Mật khẩu</div>
+
+<div class="password-box">
+    <input type="password" id="profilePassword" value="12345678" readonly>
+    <button type="button" onclick="togglePassword('profilePassword', this)">👁</button>
+</div>
+
+        <div class="profile-buttons">
+            <a href="/" class="map-btn">Về bản đồ</a>
+            <a href="{% url 'logout' %}" class="logout-btn">Đăng xuất</a>
+        </div>
+    </section>
+
+    <section class="glass-card right-box">
+        <h2 class="section-title">Lịch sử và thông báo</h2>
+
+        {% if success_message %}
+            <div class="success-box">{{ success_message }}</div>
+        {% endif %}
+
+        {% if error %}
+            <div class="error-box">{{ error }}</div>
+        {% endif %}
+
+        <div class="stats">
+            <div class="stat-card">
+                <h4>Đã duyệt</h4>
+                <div class="stat-value">{{ approved_count }}</div>
+            </div>
+
+            <div class="stat-card">
+                <h4>Chờ duyệt</h4>
+                <div class="stat-value">{{ pending_count }}</div>
+            </div>
+
+            <div class="stat-card">
+                <h4>Từ chối</h4>
+                <div class="stat-value">{{ rejected_count }}</div>
+            </div>
+        </div>
+
+        <div class="notify-box">
+            <h3 style="margin-top:0;">Thông báo đơn đặt bàn</h3>
+
+            {% if notifications %}
+                {% for note in notifications %}
+                    <div class="notify-item">
+                        <div class="muted">{{ note }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="muted">Chưa có thông báo nào.</div>
+            {% endif %}
+        </div>
+
+        <div class="history-box">
+            <h3 style="margin-top:0;">Lịch sử đặt bàn</h3>
+
+            {% if my_reservations %}
+                {% for r in my_reservations %}
+                    <div class="history-item">
+<div class="history-name">{{ r.restaurant.name }}</div>
+
+                        <div class="muted">
+                            <strong>Thời gian đặt:</strong> {{ r.booking_time|date:"d/m/Y H:i" }}<br>
+                            <strong>Số khách:</strong> {{ r.guests }}<br>
+                            <strong>Loại bàn:</strong> {{ r.get_booking_type_display }}<br>
+                            <strong>Số điện thoại:</strong> {{ r.customer_phone }}<br>
+                            <strong>Ghi chú:</strong> {{ r.note|default:"Không có" }}
+                        </div>
+
+                        {% if r.status == "pending" %}
+                            <span class="status status-pending">Đang chờ duyệt</span>
+                        {% elif r.status == "confirmed" %}
+                            <span class="status status-confirmed">Đã duyệt</span>
+                        {% elif r.status == "cancelled" %}
+                            <span class="status status-cancelled">Đã từ chối</span>
+                        {% else %}
+                            <span class="status status-pending">{{ r.status }}</span>
+                        {% endif %}
+                    </div>
+{% endfor %}
+
+            {% else %}
+
+                <div class="muted">Chưa có đơn đặt bàn nào.</div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+</div>
+
+<div id="editPopup" class="popup-overlay">
+
+    <div class="popup-box">
+
+        <div class="popup-header">
+
+            <h3>Chỉnh sửa thông tin</h3>
+
+            <button type="button" class="close-btn" onclick="closeEditPopup()">✕</button>
+
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="popup-group">
+
+                <label>Ảnh đại diện</label>
+
+                <input type="file" name="avatar" accept="image/*">
+
+            </div>
+
+            <div class="popup-group">
+
+                <label>Họ và tên</label>
+
+                <input type="text" name="full_name"
+
+                       value="{{ request.user.first_name }} {{ request.user.last_name }}">
+
+            </div>
+
+            <div class="popup-group">
+
+                <label>Email</label>
+
+                <input type="email" name="email"
+
+                       value="{{ request.user.email }}">
+
+            </div>
+
+            <div class="popup-group">
+    <label>Mật khẩu mới</label>
+
+    <div class="password-box">
+        <input type="password" name="password" id="newPassword"
+               placeholder="Nhập nếu muốn đổi mật khẩu">
+
+        <button type="button" class="eye-btn"
+                onclick="togglePassword('newPassword', this)">👁</button>
+    </div>
+</div>
+
+<div class="popup-group">
+    <label>Xác nhận mật khẩu</label>
+
+    <div class="password-box">
+        <input type="password" name="confirm_password" id="confirmPassword"
+               placeholder="Nhập lại mật khẩu">
+
+        <button type="button" class="eye-btn"
+                onclick="togglePassword('confirmPassword', this)">👁</button>
+    </div>
+</div>
+            <button type="submit" class="popup-save-btn">Lưu thay đổi</button>
+        </form>
+    </div>
+</div>
+<script>
+
+function openEditPopup(){
+    document.getElementById("editPopup").style.display = "flex";
+}
+
+function closeEditPopup(){
+    document.getElementById("editPopup").style.display = "none";
+}
+
+function togglePassword(id, btn){
+    const input = document.getElementById(id);
+
+    if(input.type === "password"){
+        input.type = "text";
+        btn.textContent = "🙈";
+
+    }else{
+        input.type = "password";
+        btn.textContent = "👁";
+}
+}
+</script>
+</body>
+</html>

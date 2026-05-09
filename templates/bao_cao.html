@@ -1,0 +1,390 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Báo cáo</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#fdf8fb;color:#4d3943}
+
+.app{
+    width:96%;
+    max-width:1500px;
+    margin:24px auto;
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:20px;
+}
+
+.sidebar{
+    background:linear-gradient(180deg,#f8d8e5,#f4bfd4);
+    border-radius:26px;
+    padding:22px 16px;
+    min-height:90vh;
+    border:1px solid #efcfe0;
+}
+
+.logo{font-size:24px;font-weight:bold;color:#b65d85;margin-bottom:28px}
+.menu-title{font-size:13px;font-weight:bold;color:#9d7388;margin:18px 0 10px;text-transform:uppercase}
+
+.sidebar a{
+    display:block;
+    text-decoration:none;
+    color:#6a4958;
+    padding:12px 14px;
+    border-radius:14px;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+.sidebar a:hover,.sidebar a.active{
+    background:linear-gradient(90deg,#e79dbf,#d97aa6);
+    color:white;
+}
+
+.main{
+    background:#fffafc;
+    border:2px solid #e8d7df;
+    border-radius:28px;
+    padding:24px;
+}
+
+.page-head h1{
+    margin:0;
+    font-size:36px;
+    color:#33252d;
+}
+
+.page-head p{
+    margin:8px 0 0;
+    color:#8f7580;
+}
+
+.toolbar{
+    display:grid;
+    grid-template-columns:1fr 1fr auto auto;
+    gap:12px;
+    margin:20px 0;
+}
+
+input{
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid #ecd2de;
+    background:#fff8fb;
+    outline:none;
+}
+
+.btn{
+    border:none;
+    border-radius:999px;
+    padding:12px 18px;
+    font-weight:bold;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-block;
+}
+
+.btn-add{background:#d97aa6;color:white}
+.btn-export{background:#fff4f8;color:#6b4557;border:1px solid #ecd2de}
+
+.card-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:#fff4f8;
+    border:1px solid #efd8e2;
+    border-radius:20px;
+    padding:18px;
+}
+
+.card span{
+    color:#8f6276;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.card h2{
+    margin:10px 0 0;
+    color:#b5547f;
+    font-size:26px;
+}
+
+.panel{
+    background:white;
+    border:1px solid #efd8e2;
+    border-radius:22px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 8px 24px rgba(213,123,166,0.08);
+}
+
+.chart-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    align-items: start;
+}
+
+.chart-box{
+    height:320px;
+    max-width:420px;
+    margin:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#fff4f8;
+    color:#6b4557;
+    padding:14px;
+    text-align:left;
+}
+
+td{
+    padding:14px;
+    border-bottom:1px solid #f3dce6;
+}
+
+@media(max-width:1000px){
+    .app{grid-template-columns:1fr}
+    .card-row,.chart-grid,.toolbar{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <aside class="sidebar">
+        <div class="logo">🌸 Admin Dashboard</div>
+
+        <div class="menu-title">Quản lý</div>
+        <a href="{% url 'admin_dashboard' %}">📊 Tổng quan</a>
+        <a href="{% url 'hang_hoa' %}">📦 Hàng hoá</a>
+        <a href="{% url 'phong_ban' %}">🍽 Phòng/Bàn</a>
+        <a href="{% url 'nhan_vien' %}">👥 Nhân viên</a>
+        <a href="{% url 'bao_cao' %}" class="active">📈 Báo cáo</a>
+
+        <div class="menu-title">Công cụ</div>
+        <a href="/">🗺 Về bản đồ</a>
+        <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+    </aside>
+
+    <main class="main">
+        <div class="page-head">
+            <h1>Báo cáo hệ thống</h1>
+            <p>Thống kê doanh thu, đặt bàn, khách hàng và hiệu suất hoạt động.</p>
+        </div>
+
+        <form method="GET" class="toolbar">
+            <input type="date" name="start_date" value="{{ start_date }}">
+            <input type="date" name="end_date" value="{{ end_date }}">
+            <button class="btn btn-add" type="submit">Lọc báo cáo</button>
+            <a class="btn btn-export" href="{% url 'export_bao_cao_excel' %}?start_date={{ start_date }}&end_date={{ end_date }}">
+                ⬇ Xuất Excel
+            </a>
+        </form>
+
+        <div class="card-row">
+            <div class="card">
+                <span>Tổng doanh thu</span>
+                <h2>{{ total_revenue }} VNĐ</h2>
+            </div>
+
+            <div class="card">
+                <span>Tổng đơn đặt bàn</span>
+                <h2>{{ total_reservations }}</h2>
+            </div>
+
+            <div class="card">
+                <span>Tổng khách</span>
+                <h2>{{ total_guests }}</h2>
+            </div>
+
+            <div class="card">
+                <span>Khung giờ đông nhất</span>
+                <h2>{{ busiest_hour }}</h2>
+            </div>
+        </div>
+
+        <div class="card-row">
+            <div class="card">
+                <span>Đã duyệt</span>
+                <h2>{{ confirmed_count }}</h2>
+            </div>
+
+            <div class="card">
+                <span>Chờ duyệt</span>
+                <h2>{{ pending_count }}</h2>
+            </div>
+
+            <div class="card">
+                <span>Huỷ bàn</span>
+                <h2>{{ cancelled_count }}</h2>
+            </div>
+
+            <div class="card">
+                <span>Tới trễ</span>
+                <h2>{{ late_count }}</h2>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <section class="panel">
+                <h2>Doanh thu theo ngày</h2>
+                <div class="chart-box">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h2>Tỉ lệ trạng thái đơn</h2>
+                <div class="chart-box">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <section class="panel">
+            <h2>Top quán có nhiều đơn</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên quán</th>
+                        <th>Số đơn</th>
+</tr>
+                </thead>
+
+                <tbody>
+                    {% for r in top_restaurants %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ r.restaurant__name }}</td>
+                        <td>{{ r.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">Chưa có dữ liệu.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+const revenueLabels = {{ revenue_labels|safe }};
+const revenueValues = {{ revenue_values|safe }};
+
+new Chart(document.getElementById("revenueChart"), {
+    type: "line",
+
+    data: {
+        labels: revenueLabels,
+
+        datasets: [{
+            label: "Doanh thu",
+            data: revenueValues,
+            tension: 0.35,
+            borderColor:"#d97aa6",
+            backgroundColor:"rgba(217,122,166,0.15)",
+            fill:true
+        }]
+    },
+
+    options:{
+        responsive:true,
+        maintainAspectRatio:false
+    }
+});
+
+new Chart(document.getElementById("statusChart"), {
+
+    type: "doughnut",
+
+    data: {
+        labels: [
+            "Đã duyệt",
+            "Chờ duyệt",
+            "Huỷ bàn",
+            "Tới trễ"
+        ],
+
+        datasets: [{
+            data: [
+                {{ confirmed_count }},
+                {{ pending_count }},
+                {{ cancelled_count }},
+                {{ late_count }}
+            ],
+
+            backgroundColor: [
+                "#6ec5ff",
+                "#ff8fb1",
+                "#ffb84d",
+                "#ffe08a"
+            ]
+        }]
+    },
+
+    options: {
+        responsive:true,
+        maintainAspectRatio:false,
+
+        plugins: {
+
+            legend: {
+                position:"top"
+            },
+
+            datalabels: {
+
+                color:"#fff",
+
+                font:{
+                    weight:"bold",
+                    size:14
+                },
+
+                formatter: (value, context) => {
+
+                    const data =
+                        context.chart.data.datasets[0].data;
+
+                    const total =
+                        data.reduce((a,b)=>a+b,0);
+
+                    const percent =
+                        ((value / total) * 100).toFixed(1);
+
+                    return percent + "%";
+                }
+            }
+        }
+    },
+
+    plugins:[ChartDataLabels]
+});
+</script>
+
+</body>
+</html>

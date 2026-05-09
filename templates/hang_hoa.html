@@ -1,0 +1,921 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý hàng hoá</title>
+
+    <style>
+        *{ box-sizing:border-box; }
+
+        body{
+            margin:0;
+            font-family:Arial, sans-serif;
+            background:#fdf8fb;
+            color:#4d3943;
+        }
+
+        .app{
+            width:96%;
+            max-width:1500px;
+            margin:24px auto;
+            display:grid;
+            grid-template-columns:220px 1fr;
+            gap:20px;
+        }
+
+        .sidebar{
+            background:linear-gradient(180deg,#f8d8e5,#f4bfd4);
+            border-radius:26px;
+            padding:22px 16px;
+            min-height:90vh;
+            border:1px solid #efcfe0;
+        }
+
+        .logo{
+            font-size:24px;
+            font-weight:bold;
+            color:#b65d85;
+            margin-bottom:28px;
+        }
+
+        .menu-title{
+            font-size:13px;
+            font-weight:bold;
+            color:#9d7388;
+            margin:18px 0 10px;
+            text-transform:uppercase;
+        }
+
+        .sidebar a{
+            display:block;
+            text-decoration:none;
+            color:#6a4958;
+            padding:12px 14px;
+            border-radius:14px;
+            margin-bottom:8px;
+            font-weight:bold;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active{
+            background:linear-gradient(90deg,#e79dbf,#d97aa6);
+            color:white;
+        }
+
+        .main{
+            background:#fffafc;
+            border:2px solid #e8d7df;
+            border-radius:28px;
+            padding:24px;
+        }
+
+        .page-head{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+        }
+
+        .page-head h1{
+            margin:0;
+            font-size:36px;
+            color:#33252d;
+        }
+
+        .page-head p{
+            margin:8px 0 0;
+            color:#8f7580;
+        }
+
+        .tabs{
+            display:flex;
+            gap:10px;
+            margin-bottom:18px;
+        }
+
+        .tab{
+            border:none;
+            padding:11px 20px;
+            border-radius:999px;
+            background:#fff4f8;
+            color:#6b4557;
+            font-weight:bold;
+            border:1px solid #ecd2de;
+            cursor:pointer;
+        }
+
+        .tab.active{
+            background:#d97aa6;
+            color:white;
+        }
+
+        .panel{
+            background:white;
+            border:1px solid #efd8e2;
+            border-radius:22px;
+            padding:20px;
+            box-shadow:0 8px 24px rgba(213,123,166,0.08);
+        }
+
+        .toolbar{
+            display:grid;
+            grid-template-columns:2fr repeat(5,1fr);
+            gap:12px;
+            margin-bottom:16px;
+        }
+
+        input, select{
+            width:100%;
+            padding:12px 14px;
+            border-radius:14px;
+            border:1px solid #ecd2de;
+            background:#fff8fb;
+            color:#6b4557;
+            outline:none;
+        }
+
+        .actions{
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            margin-bottom:16px;
+        }
+
+        .btn{
+            border:none;
+            padding:11px 18px;
+            border-radius:999px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        .btn-add{
+            background:#d97aa6;
+            color:white;
+        }
+
+        .btn-export{
+            background:#fff4f8;
+            color:#6b4557;
+            border:1px solid #ecd2de;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            overflow:hidden;
+            border-radius:16px;
+        }
+
+        th{
+            background:#fff4f8;
+            color:#6b4557;
+            padding:14px;
+            text-align:left;
+            font-size:14px;
+        }
+
+        td{
+            padding:14px;
+            border-bottom:1px solid #f3dce6;
+            font-size:14px;
+        }
+
+        tr:hover{
+            background:#fff8fb;
+        }
+
+        .tag{
+            padding:6px 12px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:bold;
+        }
+
+        .ok{
+            background:#dff4e5;
+            color:#217a46;
+        }
+
+        .warning{
+            background:#fff0cc;
+            color:#946200;
+        }
+
+        .danger{
+            background:#ffe0e4;
+            color:#b33d61;
+        }
+
+        .dropdown{
+            position:relative;
+        }
+
+        .dropdown-menu{
+            display:none;
+            position:absolute;
+            right:0;
+            top:46px;
+            width:210px;
+            background:white;
+            border:1px solid #efd8e2;
+            border-radius:18px;
+            box-shadow:0 12px 28px rgba(0,0,0,0.12);
+            overflow:hidden;
+            z-index:10;
+        }
+
+        .dropdown-menu a{
+            display:block;
+            padding:13px 16px;
+            text-decoration:none;
+            color:#6b4557;
+            font-weight:bold;
+        }
+
+        .dropdown-menu a:hover{
+            background:#fff4f8;
+        }
+
+        .dropdown:hover .dropdown-menu{
+            display:block;
+        }
+
+        @media(max-width:1000px){
+            .app{
+                grid-template-columns:1fr;
+            }
+
+            .toolbar{
+                grid-template-columns:1fr;
+            }
+
+            .page-head{
+                flex-direction:column;
+                align-items:flex-start;
+                gap:12px;
+            }
+        }
+
+        .stat-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin:16px 0;
+}
+
+.stat-card{
+    background:#fff4f8;
+    border:1px solid #efd8e2;
+    border-radius:18px;
+    padding:16px;
+}
+
+.stat-card b{
+    font-size:24px;
+    color:#b5547f;
+}
+
+.action-btn{
+    border:none;
+    border-radius:999px;
+    padding:8px 12px;
+    font-weight:bold;
+    cursor:pointer;
+    margin:2px;
+}
+
+.edit-btn{ background:#fff0cc; color:#946200; }
+.delete-btn{ background:#ffe0e4; color:#b33d61; }
+.add-btn{ background:#d97aa6; color:white; }
+.export-btn{ background:#2d1d25; color:white; }
+
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(60,30,45,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+
+.modal-box{
+    width:92%;
+    max-width:760px;
+    background:#fffafc;
+    border-radius:26px;
+    padding:24px;
+    border:1px solid #efd8e2;
+    box-shadow:0 24px 60px rgba(120,60,90,0.25);
+}
+
+.modal-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.modal-head h2{
+    margin:0;
+    color:#b5547f;
+}
+
+.close-modal{
+    border:none;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:#f1bdd0;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.form-group label{
+    display:block;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#8f6276;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    border:1px solid #efc6d6;
+    border-radius:14px;
+    padding:12px 14px;
+    outline:none;
+    background:white;
+}
+
+.form-group textarea{
+    min-height:86px;
+    resize:none;
+}
+
+.full{
+    grid-column:1 / -1;
+}
+
+.save-modal{
+    width:100%;
+    margin-top:18px;
+    padding:14px;
+    border:none;
+    border-radius:999px;
+    background:#d97aa6;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.badge{
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.badge-active{ background:#dff4e5; color:#217a46; }
+.badge-inactive{ background:#eee; color:#666; }
+.badge-out{ background:#ffe0e4; color:#b33d61; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="logo">🌸 Admin Dashboard</div>
+        <div class="menu-title">Quản lý</div>
+        <a href="{% url 'admin_dashboard' %}">📊 Tổng quan</a>
+        <a href="{% url 'hang_hoa' %}" class="active">📦 Hàng hoá</a>
+        <a href="{% url 'phong_ban' %}">🍽 Phòng/Bàn</a>
+        <a href="{% url 'nhan_vien' %}">👥 Nhân viên</a>
+        <a href="{% url 'bao_cao' %}">📈 Báo cáo</a>
+        <div class="menu-title">Công cụ</div>
+        <a href="/">🗺 Về bản đồ</a>
+        <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+    </aside>
+
+    <main class="main">
+        <div class="page-head">
+            <h1>Quản lý hàng hoá</h1>
+            <p>Quản lý danh mục, giá bán và tồn kho hàng hoá trong hệ thống.</p>
+        </div>
+
+        <div class="stat-row">
+            <div class="stat-card"><span>Tổng hàng hoá</span><br><b>{{ total_products }}</b></div>
+            <div class="stat-card"><span>Đang kinh doanh</span><br><b>{{ active_products }}</b></div>
+            <div class="stat-card"><span>Hết hàng</span><br><b>{{ out_products }}</b></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('categoryTab', this)">Danh mục</button>
+            <button class="tab" onclick="showTab('priceTab', this)">Thiết lập giá</button>
+            <button class="tab" onclick="showTab('stockTab', this)">Kiểm kho</button>
+        </div>
+
+        <!-- TAB DANH MỤC -->
+
+        <section class="panel" id="categoryTab">
+            <form method="GET" class="toolbar">
+                <input type="text" name="q" placeholder="Tìm kiếm tên hàng hoá, mã hàng..." value="{{ request.GET.q }}">
+
+                <select name="food_type">
+                    <option value="">Loại thực đơn</option>
+                    <option value="mon_an">Món ăn</option>
+                    <option value="do_uong">Đồ uống</option>
+                    <option value="combo">Combo/Buffet</option>
+                    <option value="dich_vu">Dịch vụ</option>
+                    <option value="che_bien">Hàng chế biến</option>
+                </select>
+
+                <select name="category">
+                    <option value="">Nhóm hàng</option>
+                    {% for c in categories %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="stock">
+                    <option value="">Tồn kho: Tất cả</option>
+                    <option value="under">Dưới định mức tồn</option>
+                    <option value="over">Vượt định mức tồn</option>
+                    <option value="available">Còn hàng trong kho</option>
+                    <option value="empty">Hết hàng trong kho</option>
+                </select>
+
+                <select name="status">
+<option value="">Tất cả trạng thái</option>
+                    <option value="active">Hàng đang kinh doanh</option>
+                    <option value="inactive">Hàng ngừng kinh doanh</option>
+                    <option value="out_of_stock">Hết hàng</option>
+                </select>
+
+                <button class="btn btn-add" type="submit">Lọc</button>
+
+            </form>
+
+            <div class="actions">
+
+                <button type="button" class="btn btn-add" onclick="openProductModal()">+ Thêm mới</button>
+
+                <a href="{% url 'export_products' %}" class="btn btn-export">⬇ Xuất file</a>
+
+            </div>
+<table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã hàng</th>
+                        <th>Tên hàng hoá</th>
+                        <th>Loại thực đơn</th>
+                        <th>Nhóm hàng</th>
+                        <th>Giá bán</th>
+                        <th>Tồn kho</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+
+                    <tr>
+
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ p.code }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.get_food_type_display }}</td>
+                        <td>{{ p.category.name|default:"Chưa phân loại" }}</td>
+                        <td>{{ p.price }} VNĐ</td>
+                        <td>{{ p.stock }}</td>
+                        <td>
+                            {% if p.status == "active" %}
+                                <span class="tag ok">Đang kinh doanh</span>
+                            {% elif p.status == "out_of_stock" %}
+                                <span class="tag danger">Hết hàng</span>
+                            {% else %}
+                                <span class="tag warning">Ngừng kinh doanh</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <button type="button" class="action-btn edit-btn"
+                                onclick="editProduct('{{ p.id }}','{{ p.code|escapejs }}','{{ p.name|escapejs }}','{{ p.food_type }}','{{ p.category.id|default:'' }}','{{ p.restaurant.id|default:'' }}','{{ p.price }}','{{ p.stock }}','{{ p.min_stock }}','{{ p.max_stock }}','{{ p.status }}','{{ p.description|escapejs }}')">
+
+                                Sửa
+
+                            </button>
+
+                            <a class="action-btn delete-btn"
+
+                               href="{% url 'delete_product' p.id %}"
+
+                               onclick="return confirm('Bạn có chắc muốn xoá hàng hoá này không?')">
+
+                               Xoá
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="9">Chưa có hàng hoá nào.</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+        <!-- TAB THIẾT LẬP GIÁ -->
+
+        <section class="panel" id="priceTab" style="display:none;">
+
+            <h2 style="margin-top:0;color:#b5547f;">Thiết lập giá</h2>
+
+            <p style="color:#8f7580;">Cập nhật nhanh giá bán của từng hàng hoá.</p>
+
+            <table>
+<thead>
+
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên hàng</th>
+                        <th>Giá hiện tại</th>
+                        <th>Giá mới</th>
+                        <th>Cập nhật</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    {% for p in products %}
+
+                    <tr>
+                        <td>{{ p.code }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.price }} VNĐ</td>
+                        <td>
+                            <input type="number" id="price_{{ p.id }}" value="{{ p.price }}">
+                        </td>
+
+                        <td>
+                            <button type="button" onclick="updatePrice({{ p.id }})" class="action-btn edit-btn">
+                                Lưu
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">Chưa có hàng hoá nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </section>
+
+        <!-- TAB KIỂM KHO -->
+
+        <section class="panel" id="stockTab" style="display:none;">
+            <h2 style="margin-top:0;color:#b5547f;">Kiểm kho</h2>
+            <p style="color:#8f7580;">Theo dõi tồn kho, định mức tối thiểu và tối đa.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên hàng</th>
+                        <th>Tồn hiện tại</th>
+                        <th>Tối thiểu</th>
+                        <th>Tối đa</th>
+                        <th>Trạng thái kho</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td>{{ p.code }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.stock }}</td>
+                        <td>{{ p.min_stock }}</td>
+                        <td>{{ p.max_stock }}</td>
+                        <td>
+                            {% if p.stock == 0 %}
+                                <span class="tag danger">Hết hàng</span>
+                            {% elif p.stock < p.min_stock %}
+                                <span class="tag warning">Dưới định mức</span>
+                            {% elif p.stock > p.max_stock %}
+                                <span class="tag warning">Vượt định mức</span>
+                            {% else %}
+                                <span class="tag ok">Ổn định</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+<tr>
+
+                        <td colspan="6">Chưa có dữ liệu kiểm kho.</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- MODAL THÊM / SỬA -->
+
+<div id="productModal" class="modal-overlay">
+
+    <div class="modal-box">
+
+        <div class="modal-head">
+
+            <h2 id="modalTitle">Thêm hàng hoá</h2>
+
+            <button type="button" class="close-modal" onclick="closeProductModal()">✕</button>
+
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <input type="hidden" name="product_id" id="product_id">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Mã hàng</label>
+
+                    <input type="text" name="code" id="code" placeholder="VD: MA001">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Tên hàng hoá</label>
+
+                    <input type="text" name="name" id="name" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Loại thực đơn</label>
+
+                    <select name="food_type" id="food_type">
+
+                        <option value="mon_an">Món ăn</option>
+
+                        <option value="do_uong">Đồ uống</option>
+
+                        <option value="combo">Combo/Buffet</option>
+
+                        <option value="dich_vu">Dịch vụ</option>
+
+                        <option value="che_bien">Hàng chế biến</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Nhóm hàng</label>
+
+                    <select name="category" id="category_form">
+
+                        <option value="">-- Chọn nhóm --</option>
+
+                        {% for c in categories %}
+
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Nhà hàng</label>
+
+                    <select name="restaurant" id="restaurant">
+
+                        <option value="">-- Chọn nhà hàng --</option>
+
+                        {% for r in restaurants %}
+
+                            <option value="{{ r.id }}">{{ r.name }}</option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Trạng thái</label>
+
+                    <select name="status" id="status">
+
+                        <option value="active">Đang kinh doanh</option>
+
+                        <option value="inactive">Ngừng kinh doanh</option>
+
+                        <option value="out_of_stock">Hết hàng</option>
+</select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Giá bán</label>
+
+                    <input type="number" name="price" id="price" min="0" value="0">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Tồn kho</label>
+
+                    <input type="number" name="stock" id="stock" min="0" value="0">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Tồn tối thiểu</label>
+
+                    <input type="number" name="min_stock" id="min_stock" min="0" value="0">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Tồn tối đa</label>
+
+                    <input type="number" name="max_stock" id="max_stock" min="0" value="999">
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label>Ảnh món</label>
+
+                    <input type="file" name="image" accept="image/*">
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label>Mô tả</label>
+
+                    <textarea name="description" id="description"></textarea>
+
+                </div>
+
+<script>
+function showTab(tabId, btn){
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("categoryTab").style.display = "none";
+    document.getElementById("priceTab").style.display = "none";
+    document.getElementById("stockTab").style.display = "none";
+    document.getElementById(tabId).style.display = "block";
+}
+
+function openProductModal(){
+    document.getElementById("modalTitle").innerText = "Thêm hàng hoá";
+    document.getElementById("product_id").value = "";
+    document.getElementById("code").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("food_type").value = "mon_an";
+    document.getElementById("category_form").value = "";
+    document.getElementById("restaurant").value = "";
+    document.getElementById("status").value = "active";
+    document.getElementById("price").value = 0;
+    document.getElementById("stock").value = 0;
+    document.getElementById("min_stock").value = 0;
+    document.getElementById("max_stock").value = 999;
+    document.getElementById("description").value = "";
+    document.getElementById("productModal").style.display = "flex";
+}
+
+function closeProductModal(){
+    document.getElementById("productModal").style.display = "none";
+}
+
+function editProduct(id, code, name, foodType, categoryId, restaurantId, price, stock, minStock, maxStock, status, description){
+    document.getElementById("modalTitle").innerText = "Sửa hàng hoá";
+    document.getElementById("product_id").value = id;
+    document.getElementById("code").value = code;
+    document.getElementById("name").value = name;
+    document.getElementById("food_type").value = foodType;
+    document.getElementById("category_form").value = categoryId;
+    document.getElementById("restaurant").value = restaurantId;
+    document.getElementById("price").value = price;
+    document.getElementById("stock").value = stock;
+    document.getElementById("min_stock").value = minStock;
+    document.getElementById("max_stock").value = maxStock;
+    document.getElementById("status").value = status;
+    document.getElementById("description").value = description;
+    document.getElementById("productModal").style.display = "flex";
+}
+
+const tabs = document.querySelectorAll(".tab");
+
+tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => {
+
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        document.querySelector(".panel").style.display = index === 0 ? "block" : "none";
+        document.getElementById("priceTab").style.display = index === 1 ? "block" : "none";
+    });
+});
+
+function updatePrice(productId){
+    let newPrice = document.getElementById("price_" + productId).value;
+
+    fetch("/update-price/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: `id=${productId}&price=${newPrice}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            alert("Cập nhật giá thành công");
+            location.reload();
+        }else{
+            alert("Lỗi!");
+        }
+    });
+}
+
+function updateStock(productId){
+    const value = document.getElementById("stock_" + productId).value;
+
+    fetch(`/update-stock/${productId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "stock=" + value
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success){
+            alert("Cập nhật thành công!");
+            location.reload();
+        }else{
+            alert("Lỗi!");
+        }
+    });
+}
+</script>
+
+</body>
+</html>

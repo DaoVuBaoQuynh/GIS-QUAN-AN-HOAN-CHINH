@@ -1,0 +1,83 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Đăng nhập Admin</title>
+  <link rel="stylesheet" href="{% static 'css/pastel-pink.css' %}">
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background: #fff7fa;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      margin:0;
+    }
+    .login-box{
+      width:380px;
+      background:white;
+      padding:28px;
+      border-radius:20px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.08);
+    }
+    h2{
+      text-align:center;
+      color:#c75b8c;
+      margin-bottom:20px;
+    }
+    input{
+      width:100%;
+      padding:12px;
+      margin-bottom:12px;
+      border:1px solid #f0bfd1;
+      border-radius:12px;
+      box-sizing:border-box;
+    }
+    button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:12px;
+      background:#e889b0;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .error{
+      color:red;
+      margin-bottom:10px;
+      font-size:14px;
+    }
+    .links{
+      text-align:center;
+      margin-top:12px;
+    }
+    .links a{
+      color:#c75b8c;
+      text-decoration:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>🌸 Đăng nhập Admin</h2>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="text" name="username" placeholder="Tên đăng nhập admin">
+      <input type="password" name="password" placeholder="Mật khẩu">
+      <button type="submit">Đăng nhập Admin</button>
+    </form>
+
+    <div class="links">
+      <a href="{% url 'user_login' %}">Đăng nhập khách</a>
+    </div>
+  </div>
+</body>
+</html>

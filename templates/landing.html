@@ -1,0 +1,598 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Trang chủ - GIS Quản lý quán ăn</title>
+  <link rel="stylesheet" href="{% static 'css/pastel-pink.css' %}">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff7fa;
+      color: #4b3a42;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #f3dce6;
+    }
+
+    .nav {
+      max-width: 1200px;
+      margin: auto;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #cb628f;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: #7b5667;
+      margin-left: 16px;
+      font-weight: 600;
+    }
+
+    .menu .btn {
+      background: #f59cb8;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 999px;
+    }
+
+    .hero {
+      max-width: 1200px;
+      margin: 28px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .hero-text {
+      background: linear-gradient(135deg, #ffd9e7, #fff0f6);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+    }
+
+    .hero-text h1 {
+      margin-top: 0;
+      font-size: 42px;
+      line-height: 1.2;
+      color: #c65888;
+    }
+
+    .hero-text p {
+      color: #6f5a64;
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      margin-top: 22px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-actions a {
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      display: inline-block;
+      transition: 0.25s;
+    }
+
+    .btn-main {
+      background: #f59cb8;
+      color: white;
+    }
+
+    .btn-main:hover,
+    .card-btn:hover,
+    .social-link:hover {
+      transform: translateY(-2px);
+      opacity: 0.92;
+    }
+
+    .btn-sub {
+      background: white;
+      color: #c75b8c;
+      border: 1px solid #f2cade;
+    }
+
+    .hero-image {
+      height: 430px;
+      border-radius: 28px;
+      background: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+    }
+
+    .section {
+      max-width: 1200px;
+      margin: 34px auto;
+      padding: 0 20px;
+    }
+
+    .section h2 {
+      margin-bottom: 18px;
+      color: #ca628e;
+      font-size: 30px;
+    }
+
+    .intro-box {
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+      line-height: 1.9;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: bold;
+      color: #d4588b;
+      margin-bottom: 8px;
+    }
+
+    .stat-title {
+      color: #8f6b79;
+      font-size: 14px;
+    }
+
+    .slider-wrap {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+    }
+
+    .slider-track {
+      display: flex;
+      gap: 18px;
+      width: max-content;
+      animation: scrollLeft 30s linear infinite;
+    }
+
+    .slider-wrap:hover .slider-track {
+      animation-play-state: paused;
+    }
+
+    .hot-rated-section{
+      width:100%;
+      padding:30px 0;
+    }  
+
+    .hot-rated-container{
+      width:min(1100px, 92%);
+      margin:0 auto;
+   }
+
+.hot-rated-container h2{
+    text-align:left;
+    color:#b85f86;
+    margin-bottom:18px;
+    font-size:28px;
+}
+
+.hot-rated-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+    gap:18px;
+}
+
+.hot-card{
+    background:white;
+    border:1px solid #f1d7e2;
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 8px 20px rgba(214, 145, 176, 0.08);
+}
+
+.hot-card h3{
+    margin:0 0 10px;
+    color:#8f4f6c;
+    font-size:18px;
+}
+
+.hot-card p{
+    margin:6px 0;
+    color:#6f5a64;
+    line-height:1.5;
+}
+
+.empty-rated{
+    color:#7d6571;
+    background:white;
+    border:1px dashed #efcddd;
+    border-radius:18px;
+    padding:18px;
+}
+
+    @keyframes scrollLeft {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    .food-card {
+      width: 280px;
+      background: white;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+      border: 1px solid #f3dde7;
+      flex-shrink: 0;
+      transition: 0.25s;
+    }
+
+    .food-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 28px rgba(0,0,0,0.08);
+    }
+
+    .food-card img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .food-body {
+      padding: 16px;
+    }
+
+    .food-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #59434f;
+      margin-bottom: 8px;
+    }
+
+    .food-meta {
+      font-size: 14px;
+      color: #7d6671;
+      line-height: 1.7;
+      min-height: 72px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #fff2f7;
+      color: #cb628f;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .card-btn {
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      transition: 0.25s;
+    }
+
+    .map-btn {
+      background: #f59cb8;
+      color: white;
+    }
+
+    .reserve-btn {
+      background: #eef6ff;
+      color: #2e79be;
+    }
+
+    .popular-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .popular-card {
+      background: white;
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+      border: 1px solid #f3dde7;
+    }
+
+    .popular-card h3 {
+      margin-top: 0;
+      color: #c85d8d;
+    }
+
+    .popular-card p {
+      color: #6e5963;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .social-link {
+      display: block;
+      text-decoration: none;
+      padding: 20px;
+      background: white;
+border-radius: 20px;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+      text-align: center;
+      font-weight: 700;
+      color: #5d4650;
+      transition: 0.25s;
+    }
+
+    footer {
+      margin-top: 44px;
+      background: #ffe7f0;
+      padding: 28px 20px;
+      text-align: center;
+      color: #7f5d6c;
+      border-top: 1px solid #f0d3de;
+    }
+
+    @media (max-width: 992px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .popular-grid,
+      .social-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid,
+      .popular-grid,
+      .social-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-text h1 {
+        font-size: 32px;
+      }
+
+      .menu a {
+        margin-left: 10px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">🌸 GIS Quán Ăn</div>
+    <div class="menu">
+      <a href="{% url 'landing_page' %}">Trang chủ</a>
+      <a href="{% url 'home_map' %}">Bản đồ</a>
+      <a href="{% url 'user_login' %}">Đăng nhập</a>
+      <a href="{% url 'register' %}" class="btn">Đăng ký</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>Khám phá quán ăn nổi bật và đặt bàn thuận tiện trên nền bản đồ số</h1>
+    <p>
+      Website giúp người dùng tìm kiếm quán ăn theo vị trí, xem quán hot, lọc theo loại quán,
+      đặt bàn thường hoặc VIP, lưu quán yêu thích và theo dõi trải nghiệm ăn uống một cách trực quan.
+      Đây là hệ thống ứng dụng Web GIS nhằm kết hợp dữ liệu không gian với quản lý quán ăn hiện đại.
+    </p>
+    <div class="hero-actions">
+      <a href="{% url 'home_map' %}" class="btn-main">🗺 Xem bản đồ</a>
+      <a href="{% url 'user_login' %}" class="btn-sub">🔐 Đăng nhập</a>
+      <a href="{% url 'register' %}" class="btn-sub">📝 Đăng ký</a>
+    </div>
+  </div>
+  <div class="hero-image"></div>
+</section>
+
+<section class="section">
+  <h2>📌 Giới thiệu chi tiết về website</h2>
+  <div class="intro-box">
+    <p>
+      Website hệ thống hỗ trợ người dùng tra cứu, khám phá và đặt bàn tại các quán ăn
+      thông qua bản đồ số trực quan. Hệ thống cho phép hiển thị thông tin quán ăn theo vị trí địa lý,
+      hỗ trợ lọc theo loại quán, bán kính tìm kiếm và trạng thái bàn còn trống hay đã hết.
+    </p>
+    <p>
+      Không chỉ phục vụ khách hàng, hệ thống còn hỗ trợ nhân viên và quản trị viên trong việc theo dõi
+      trạng thái bàn, phê duyệt đơn đặt bàn, quản lý quán ăn, thống kê doanh thu và giám sát hoạt động
+      chung của hệ thống.
+    </p>
+    <p>
+Mục tiêu chính của website là giúp quá trình tìm quán, xem vị trí, đặt bàn và quản lý dữ liệu quán ăn
+      trở nên hiện đại, nhanh chóng, dễ sử dụng và phù hợp với xu hướng số hóa hiện nay.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <h2>📊 Thống kê nhanh</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ total_restaurants }}</div>
+      <div class="stat-title">Quán ăn đang hoạt động</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_categories }}</div>
+      <div class="stat-title">Loại quán ăn</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_tables }}</div>
+      <div class="stat-title">Bàn ăn trong hệ thống</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_reservations }}</div>
+      <div class="stat-title">Lượt đặt bàn</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>🔥 Quán ăn hot</h2>
+  <div class="slider-wrap">
+    <div class="slider-track">
+      {% for r in hot_restaurants %}
+      <div class="food-card">
+        <img src="{% if r.image_url %}{{ r.image_url }}{% else %}https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200&auto=format&fit=crop{% endif %}" alt="{{ r.name }}">
+        <div class="food-body">
+          <div class="tag">{{ r.category.name|default:"Chưa phân loại" }}</div>
+          <div class="food-title">{{ r.name }}</div>
+          <div class="food-meta">
+            {{ r.address }}<br>
+            Mức giá: {{ r.price_level }}/5
+          </div>
+          <div class="card-actions">
+            <a href="{% url 'home_map' %}" class="card-btn map-btn">Xem bản đồ</a>
+            <a href="{% url 'reserve' %}?restaurant={{ r.id }}" class="card-btn reserve-btn">Đặt bàn</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      {% for r in hot_restaurants %}
+      <div class="food-card">
+        <img src="{% if r.image_url %}{{ r.image_url }}{% else %}https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1200&auto=format&fit=crop{% endif %}" alt="{{ r.name }}">
+        <div class="food-body">
+          <div class="tag">{{ r.category.name|default:"Chưa phân loại" }}</div>
+          <div class="food-title">{{ r.name }}</div>
+          <div class="food-meta">
+            {{ r.address }}<br>
+            Mức giá: {{ r.price_level }}/5
+          </div>
+          <div class="card-actions">
+            <a href="{% url 'home_map' %}" class="card-btn map-btn">Xem bản đồ</a>
+            <a href="{% url 'reserve' %}?restaurant={{ r.id }}" class="card-btn reserve-btn">Đặt bàn</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>⭐ Gợi ý quán ăn được nhiều người đặt</h2>
+  <div class="popular-grid">
+    {% for r in popular_restaurants %}
+    <div class="popular-card">
+      <h3>{{ r.name }}</h3>
+      <p>
+        <b>Loại quán:</b> {{ r.category.name|default:"Chưa phân loại" }}<br>
+        <b>Địa chỉ:</b> {{ r.address }}<br>
+        <b>Mức giá:</b> {{ r.price_level }}/5<br>
+        <b>Lượt đặt:</b> {{ r.total_reservations }}
+      </p>
+      <div class="card-actions">
+        <a href="{% url 'home_map' %}" class="card-btn map-btn">Xem trên bản đồ</a>
+        <a href="{% url 'reserve' %}?restaurant={{ r.id }}" class="card-btn reserve-btn">Đặt bàn ngay</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="hot-rated-section">
+    <div class="hot-rated-container">
+        <h2>Quán ăn được đánh giá cao</h2>
+
+        <div class="hot-rated-grid">
+            {% for r in top_rated_restaurants %}
+                <div class="hot-card">
+                    <h3>{{ r.name }}</h3>
+                    <p>Địa chỉ: {{ r.address }}</p>
+                    <p>
+                        Điểm trung bình:
+                        {% if r.avg_rating %}
+                            {{ r.avg_rating|floatformat:1 }}/5
+                        {% else %}
+                            Chưa có đánh giá
+                        {% endif %}
+                    </p>
+                </div>
+            {% empty %}
+                <div class="empty-rated">Chưa có dữ liệu đánh giá.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+  <h2>📱 Liên hệ với chúng tôi</h2>
+  <div class="social-grid">
+    <a href="https://facebook.com" target="_blank" class="social-link">📘 Facebook</a>
+    <a href="https://instagram.com" target="_blank" class="social-link">📸 Instagram</a>
+    <a href="https://tiktok.com" target="_blank" class="social-link">🎵 TikTok</a>
+    <a href="mailto:gisquanan@gmail.com" class="social-link">📧 Email</a>
+  </div>
+</section>
+
+<footer>
+  <div><b>Quản lý quán ăn</b></div>
+  <div style="margin-top:8px;">Liên hệ: cuahangquanan@gmail.com</div>
+</footer>
+
+</body>
+</html>

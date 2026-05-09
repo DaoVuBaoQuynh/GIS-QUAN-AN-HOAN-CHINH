@@ -5,106 +5,288 @@
   <meta charset="utf-8"/>
   <title>Web GIS Quản lý quán ăn</title>
 
-  <!-- CSS pastel hồng -->
   <link rel="stylesheet" href="{% static 'css/pastel-pink.css' %}">
-
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
 
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #fff7fa; }
+    *{box-sizing:border-box}
 
-    header {
-      padding: 14px 20px;
-      background: linear-gradient(90deg, #f7b7cc, #f9d3e0);
-      color: #7a2f4d;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
-    header a {
-      color: #7a2f4d;
-      font-weight: 600;
-      text-decoration: none;
-      margin-left: 12px;
-    }
-    header a:hover { text-decoration: underline; }
-
-    .panel {
-      margin: 16px;
-      padding: 16px;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    }
-    .row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    input, select {
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid #f1b7cc;
-      outline: none;
-    }
-    button {
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: none;
-      background: #f59cb8;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    button:hover {
-      background: #f07aa3;
-      transform: translateY(-1px);
-    }
-    .hint { margin-top: 8px; color: #8a4b63; font-size: 14px; }
-
-    #stats-box {
-      margin: 16px;
-      padding: 16px;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    body{
+      font-family:Arial,sans-serif;
+      margin:0;
+      background:#fff7fa;
     }
 
-    #map {
-      width: 100%;
-      height: 600px;
-      margin: 16px;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    header{
+      padding:14px 20px;
+      background:linear-gradient(90deg,#f7b7cc,#f9d3e0);
+      color:#7a2f4d;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
 
-    /* Legend */
-    #legend {
-      position: absolute;
-      bottom: 30px;
-      right: 20px;
-      background: white;
-      padding: 12px 14px;
-      border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-      font-size: 14px;
-      z-index: 999;
+    header div{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
     }
-    #legend .dot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      margin-right: 6px;
+
+    header div a,
+    header div span{
+      padding:8px 14px;
+      border-radius:20px;
+      background:#f8d7e3;
+      color:#7a3d57;
+      text-decoration:none;
+      font-weight:600;
     }
-    .cafe { background: #ff7fb7; }
-    .buffet { background: #a78bfa; }
-    .bun { background: #60a5fa; }
+
+    .panel{
+      margin:16px;
+      padding:16px;
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    input,select,textarea{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid #f1b7cc;
+      outline:none;
+      font-family:Arial,sans-serif;
+    }
+
+    textarea{
+      width:100%;
+      min-height:90px;
+      border-radius:16px;
+      resize:none;
+    }
+
+    button{
+      padding:10px 18px;
+      border-radius:999px;
+      border:none;
+      background:#f59cb8;
+      color:white;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    #map{
+      width:calc(100% - 32px);
+      height:600px;
+      margin:16px;
+      border-radius:18px;
+      overflow:hidden;
+    }
+
+    #legend{
+      position:absolute;
+      bottom:30px;
+      right:20px;
+      background:white;
+      padding:12px;
+      border-radius:12px;
+      z-index:999;
+      box-shadow:0 10px 20px rgba(0,0,0,0.15);
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    .dot{
+      width:12px;
+      height:12px;
+      display:inline-block;
+      border-radius:50%;
+      margin-right:5px;
+    }
+
+    .leaflet-routing-container{
+      display:none!important;
+    }
+
+    #route-info{
+      margin:16px;
+      padding:14px 16px;
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.08);
+      color:#5f4b57;
+      font-size:15px;
+    }
+
+    #route-info b{
+      color:#2f80ed;
+    }
+
+    .transport-box{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .transport-btn{
+      background:#fce4ee;
+      color:#7a2f4d;
+      border:1px solid #f1b7cc;
+      padding:8px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:600;
+      transition:0.2s;
+    }
+
+    .transport-btn.active{
+      background:#7cc6ff;
+color:white;
+      border-color:#7cc6ff;
+    }
+
+    .route-animated{
+      stroke-dasharray:12 12;
+      animation:dashMove 1s linear infinite;
+    }
+
+    @keyframes dashMove{
+      to{stroke-dashoffset:-24}
+    }
+
+    .filter-inline{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      color:#7a2f4d;
+      font-size:14px;
+    }
+
+    .popup-box{
+      max-width:250px;
+    }
+
+    .popup-image{
+      width:100%;
+      height:120px;
+      object-fit:cover;
+      border-radius:12px;
+      margin-bottom:8px;
+    }
+
+    .popup-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .popup-actions button,
+    .popup-actions a{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      border:none;
+      color:white;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .popup-actions .route-btn{background:#5dade2}
+    .popup-actions .fav-btn{background:#ff7aa8}
+    .popup-actions .fav-btn.active-fav{background:#e74c3c}
+    .popup-actions .reserve-btn{background:#9b59b6}
+    .popup-actions .delete-btn{background:#e85d75}
+    .popup-actions .save-btn{background:#27ae60}
+
+    #addRestaurantModal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(45,29,37,0.35);
+      backdrop-filter:blur(3px);
+      z-index:9999;
+    }
+
+    .modal-content{
+      background:#fffafc;
+      padding:26px;
+      border-radius:28px;
+      width:420px;
+      max-width:90%;
+      position:fixed;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      box-shadow:0 25px 60px rgba(122,47,77,0.25);
+      border:1px solid #f1b7cc;
+    }
+
+    .modal-content h3{
+      margin:0 0 18px;
+      color:#7a2f4d;
+      font-size:26px;
+    }
+
+    .modal-content input,
+    .modal-content textarea{
+      width:100%;
+      margin-bottom:12px;
+      background:#fff;
+      border:1px solid #efc5d5;
+      border-radius:18px;
+      padding:14px 16px;
+      font-size:15px;
+      color:#5d4953;
+      box-sizing:border-box;
+    }
+
+    .modal-content input:focus,
+    .modal-content textarea:focus{
+      border-color:#d97aa6;
+      box-shadow:0 0 0 4px rgba(217,122,166,0.15);
+    }
+
+    .modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .modal-actions button{
+      padding:12px 22px;
+      font-size:15px;
+    }
+
+    .cancel-btn{
+      background:#6f6f6f;
+    }
+
+    .cancel-btn:hover{
+      background:#555;
+    }
+
+    .fake-image{
+  height:120px;
+  background:linear-gradient(135deg,#f7b7cc,#f9d3e0);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+}
   </style>
 </head>
 
@@ -112,16 +294,32 @@
 
 <header>
   <div><b>🌸 GIS Quản lý quán ăn</b></div>
+
   <div>
     <a href="/dat-ban/">Đặt bàn</a>
-    <a href="/staff/">Nhân viên</a>
-    <a href="/admin/">Admin</a>
+    <a href="{% url 'my_favorites' %}">Yêu thích</a>
+
+    {% if request.user.is_authenticated %}
+      <span>Xin chào {{ request.user.username }}</span>
+
+      {% if request.user.is_superuser %}
+        <a href="{% url 'admin_login' %}">Admin</a>
+        <a href="{% url 'staff_dashboard' %}">Staff</a>
+        <a href="{% url 'staff_login' %}">Đăng nhập staff</a>
+      {% endif %}
+
+      <a href="{% url 'logout' %}">Đăng xuất</a>
+    {% else %}
+      <a href="{% url 'user_login' %}">Đăng nhập</a>
+    {% endif %}
   </div>
 </header>
 
 <div class="panel">
   <div class="row">
-    <input id="q" placeholder="Tìm tên quán..." />
+    <input id="searchAll" placeholder="Tìm quán..." />
+<button onclick="searchPlacesInHCM()">🌍 Trên bản đồ</button>
+    
 
     <select id="category">
       <option value="">-- Tất cả loại --</option>
@@ -130,28 +328,34 @@
       {% endfor %}
     </select>
 
-    <input id="radius_km" type="number" min="0" step="0.5"
-           placeholder="Bán kính (km)" style="width:150px"/>
+    <input id="radius_km" type="number" min="0" step="0.5" placeholder="Bán kính (km)"/>
 
-    <button onclick="getMyLocation()">📍 Lấy vị trí tôi</button>
-    <button onclick="loadRestaurants()">🔍 Áp dụng lọc</button>
+    <label class="filter-inline">
+      <input type="checkbox" id="only_favorites" style="width:auto;">
+      Chỉ xem quán yêu thích
+    </label>
+
+    <button onclick="getMyLocation()">📍 Vị trí tôi</button>
+    <button onclick="loadRestaurants()">🔍 Lọc</button>
+    <button onclick="clearRoute()">❌ Xóa đường</button>
   </div>
 
-  <p class="hint">Nhập bán kính → bấm “Lấy vị trí tôi” → “Áp dụng lọc”</p>
+  <div class="transport-box">
+    <button class="transport-btn active" id="btn-driving" onclick="setTransportMode('driving')">🚗 Ô tô</button>
+    <button class="transport-btn" id="btn-walking" onclick="setTransportMode('walking')">🚶 Đi bộ</button>
+    <button class="transport-btn" id="btn-motorbike" onclick="setTransportMode('motorbike')">🛵 Xe máy</button>
+  </div>
 </div>
 
-<div id="stats-box">
-  <h3>📊 Thống kê quán ăn theo loại</h3>
-  <ul id="stats-category">
-    <li>Đang tải dữ liệu...</li>
-  </ul>
+<div id="route-info">
+  <b>Thông tin chỉ đường:</b> Chưa có tuyến đường nào.
 </div>
 
 <div id="legend">
-  <b>Chú thích</b>
-  <div><span class="dot cafe"></span> Cafe</div>
-  <div><span class="dot buffet"></span> Buffet</div>
-  <div><span class="dot bun"></span> Bún/Mì</div>
+  <b>Chú thích trạng thái bàn</b><br>
+  <span class="dot" style="background:#4caf50;"></span> Còn bàn thường<br>
+  <span class="dot" style="background:#ff4fa3;"></span> Còn bàn VIP<br>
+  <span class="dot" style="background:#9e9e9e;"></span> Hết bàn
 </div>
 
 <div id="map"
@@ -160,139 +364,452 @@
      data-zoom="{{ center.zoom }}">
 </div>
 
+<div id="addRestaurantModal">
+  <div class="modal-content">
+    <h3>Thêm quán ăn mới</h3>
+
+    <input id="nameInput" type="text" placeholder="Tên quán ăn">
+    <input id="addressInput" type="text" placeholder="Địa chỉ">
+    <textarea id="descriptionInput" placeholder="Mô tả"></textarea>
+
+    <input id="latInput" type="hidden">
+    <input id="lngInput" type="hidden">
+
+    <div class="modal-actions">
+      <button onclick="saveRestaurant()">Lưu quán</button>
+      <button class="cancel-btn" onclick="closeModal()">Huỷ</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
 <script>
-/* ===== Stats ===== */
-async function loadStatsCategory() {
-  try {
-    const res = await fetch("/stats/category");
-    const json = await res.json();
+const mapDiv = document.getElementById("map");
 
-    const ul = document.getElementById("stats-category");
-    ul.innerHTML = "";
+const map = L.map("map").setView(
+  [parseFloat(mapDiv.dataset.lat), parseFloat(mapDiv.dataset.lng)],
+parseInt(mapDiv.dataset.zoom)
+);
 
-    if (!json.data || json.data.length === 0) {
-      ul.innerHTML = "<li>Chưa có dữ liệu</li>";
+L.tileLayer("https://tile.openstreetmap.de/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+let markersLayer = L.layerGroup().addTo(map);
+let searchLayer = L.layerGroup().addTo(map);
+let myLatLng = null;
+let myMarker = null;
+let routingControl = null;
+let radiusCircle = null;
+let currentTransportMode = "driving";
+let selectedLat = null;
+let selectedLng = null;
+
+/* CSRF */
+function getCookie(name){
+  let cookieValue = null;
+
+  if(document.cookie && document.cookie !== ""){
+    const cookies = document.cookie.split(";");
+
+    for(let i = 0; i < cookies.length; i++){
+      const cookie = cookies[i].trim();
+
+      if(cookie.substring(0, name.length + 1) === (name + "=")){
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+
+  return cookieValue;
+}
+
+/* CLICK BẢN ĐỒ ĐỂ THÊM QUÁN + TỰ ĐIỀN ĐỊA CHỈ */
+map.on("click", function(e){
+  selectedLat = e.latlng.lat;
+  selectedLng = e.latlng.lng;
+
+  document.getElementById("nameInput").value = "";
+  document.getElementById("addressInput").value = "Đang lấy địa chỉ...";
+  document.getElementById
+  document.getElementById("descriptionInput").value = "";
+  document.getElementById("latInput").value = selectedLat;
+  document.getElementById("lngInput").value = selectedLng;
+  document.getElementById("addRestaurantModal").style.display = "block";
+
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLat}&lon=${selectedLng}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("addressInput").value = data.display_name || "";
+    })
+
+    .catch(() => {
+      document.getElementById("addressInput").value = "";
+    });
+});
+
+function closeModal(){
+  document.getElementById("addRestaurantModal").style.display = "none";
+}
+
+/* LƯU QUÁN MỚI */
+function saveRestaurant(){
+  const name = document.getElementById("nameInput").value.trim();
+  const address = document.getElementById("addressInput").value.trim();
+  const description = document.getElementById("descriptionInput").value.trim();
+  const latitude = document.getElementById("latInput").value;
+  const longitude = document.getElementById("lngInput").value;
+
+  if(!name){
+    alert("Vui lòng nhập tên quán ăn.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("address", address);
+  formData.append("description", description);
+  formData.append("latitude", latitude);
+  formData.append("longitude", longitude);
+
+  fetch("{% url 'add_restaurant_from_map' %}", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken")
+    },
+
+    body: formData
+  })
+
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      closeModal();
+      alert("Đã thêm quán ăn mới!");
+      loadRestaurants();
+    }else{
+      alert(data.message || "Không thêm được quán.");
+    }
+  })
+
+  .catch(() => {
+    alert("Có lỗi khi thêm quán.");
+  });
+}
+
+/* XOÁ QUÁN */
+function deleteRestaurant(id){
+  if(!confirm("Bạn có chắc muốn xoá quán này không?")) return;
+  fetch(`/map/delete-restaurant/${id}/`, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken"),
+      "X-Requested-With": "XMLHttpRequest"
+    }
+  })
+
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      alert("Đã xoá quán!");
+      loadRestaurants();
+    }else{
+      alert(data.message || "Không xoá được quán.");
+    }
+  });
+}
+
+/* YÊU THÍCH */
+async function toggleFavorite(restaurantId, btn){
+  try{
+    const res = await fetch(`/favorite/${restaurantId}/toggle/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCookie("csrftoken"),
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
+
+    if(!res.ok){
+      alert("Bạn cần đăng nhập để lưu yêu thích.");
       return;
     }
 
-    json.data.forEach(item => {
-      const li = document.createElement("li");
-      li.textContent = `${item.category}: ${item.total} quán`;
-      ul.appendChild(li);
-    });
-  } catch (e) {
-    document.getElementById("stats-category").innerHTML = "<li>Lỗi tải thống kê</li>";
-    console.error(e);
+    const data = await res.json();
+    if(data.favorited){
+      btn.textContent = "💔 Bỏ yêu thích";
+      btn.classList.add("active-fav");
+    }else{
+      btn.textContent = "❤️ Yêu thích";
+      btn.classList.remove("active-fav");
+    }
+
+  }catch(e){
+    alert("Có lỗi khi lưu yêu thích.");
+  }
+}
+window.toggleFavorite = toggleFavorite;
+
+/* THỐNG KÊ */
+async function loadStatsCategory(){
+  try{
+    const res = await fetch("/stats/category");
+    await res.json();
+  }catch(e){
+    console.log("Stats lỗi:", e);
   }
 }
 
-/* ===== Map init ===== */
-const mapDiv = document.getElementById("map");
-const CENTER_LAT = parseFloat(mapDiv.dataset.lat);
-const CENTER_LNG = parseFloat(mapDiv.dataset.lng);
-const CENTER_ZOOM = parseInt(mapDiv.dataset.zoom);
+/* CHỌN PHƯƠNG TIỆN */
+function setTransportMode(mode){
+  currentTransportMode = mode;
+  document.querySelectorAll(".transport-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
 
-const map = L.map("map").setView([CENTER_LAT, CENTER_LNG], CENTER_ZOOM);
+  if(mode === "driving"){
+    document.getElementById("btn-driving").classList.add("active");
+  }else if(mode === "walking"){
+    document.getElementById("btn-walking").classList.add("active");
+  }else if(mode === "motorbike"){
+    document.getElementById("btn-motorbike").classList.add("active");
+  }
+}
+window.setTransportMode = setTransportMode;
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 })
-  .addTo(map);
+/* LẤY VỊ TRÍ */
+function getMyLocation(){
+  navigator.geolocation.getCurrentPosition(pos => {
+    myLatLng = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude
+    };
 
-let markersLayer = L.layerGroup().addTo(map);
-let myMarker = null;
-let myLatLng = null;
-let radiusCircle = null;
+    if(myMarker) map.removeLayer(myMarker);
+    myMarker = L.marker([myLatLng.lat, myLatLng.lng])
+      .addTo(map)
+      .bindPopup("📍 Vị trí của bạn")
+      .openPopup();
+    map.setView([myLatLng.lat, myLatLng.lng], 14);
+    drawRadiusCircle();
+  }, err => {
+    alert("Không lấy được vị trí: " + err.message);
+  });
+}
 
-/* ===== Circle ===== */
-function drawRadiusCircle() {
+/* VẼ BÁN KÍNH */
+function drawRadiusCircle(){
   const radius = parseFloat(document.getElementById("radius_km").value || "0");
-
-  if (radiusCircle) {
+  if(radiusCircle){
     map.removeLayer(radiusCircle);
     radiusCircle = null;
   }
 
-  if (!myLatLng || !radius || radius <= 0) return;
-
+  if(!myLatLng || !radius || radius <= 0) return;
   radiusCircle = L.circle([myLatLng.lat, myLatLng.lng], {
     radius: radius * 1000,
     weight: 2,
-    opacity: 0.9,
-    fillOpacity: 0.15
+    opacity: 0.8,
+    fillOpacity: 0.12,
+    color: "#5dade2"
   }).addTo(map);
-
-  map.fitBounds(radiusCircle.getBounds());
 }
 
-/* ===== Colored marker ===== */
-function categoryColor(categoryName) {
-  const c = (categoryName || "").toLowerCase();
-  if (c.includes("cafe")) return "#ff7fb7";
-  if (c.includes("buffet")) return "#a78bfa";
-  if (c.includes("bún") || c.includes("bun")) return "#60a5fa";
-  if (c.includes("mì") || c.includes("mi")) return "#fb7185";
-  return "#f59cb8";
-}
-
-function markerIcon(color) {
+/* ICON MARKER */
+function markerIcon(color){
   return L.divIcon({
     className: "",
     html: `
       <div style="
-        width:18px;height:18px;
+        width:18px;
+        height:18px;
         border-radius:999px;
         background:${color};
         border:3px solid white;
-        box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+        box-shadow:0 10px 22px rgba(0,0,0,0.18);
       "></div>
     `,
-    iconSize: [18, 18],
-    iconAnchor: [9, 9],
-    popupAnchor: [0, -10]
+
+    iconSize: [18,18],
+    iconAnchor: [9,9],
+    popupAnchor: [0,-10]
   });
 }
 
-/* ===== distance for popup ===== */
-function distanceKm(lat1, lng1, lat2, lng2) {
+function markerColorByAvailability(p){
+  if(!p.normal_available && !p.vip_available) return "#9e9e9e";
+  if(p.vip_available) return "#ff4fa3";
+  return "#4caf50";
+}
+
+/* TÍNH KHOẢNG CÁCH */
+function distanceKm(lat1, lng1, lat2, lng2){
   const R = 6371;
   const toRad = x => x * Math.PI / 180;
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat/2)**2 +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
-  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) *
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/* ===== Load restaurants ===== */
-async function loadRestaurants() {
+/* ĐỊNH DẠNG THỜI GIAN */
+function formatDuration(seconds){
+  const mins = Math.round(seconds / 60);
+  if(mins < 60) return mins + " phút";
+  const hours = Math.floor(mins / 60);
+  const remain = mins % 60;
+  return hours + " giờ " + remain + " phút";
+}
+
+/* THÔNG TIN TUYẾN */
+function updateRouteInfo(summary){
+  const distanceKmValue = (summary.totalDistance / 1000).toFixed(2);
+  const durationText = formatDuration(summary.totalTime);
+  let icon = "🚗";
+  let label = "Ô tô";
+  if(currentTransportMode === "walking"){
+    icon = "🚶";
+    label = "Đi bộ";
+  }else if(currentTransportMode === "motorbike"){
+    icon = "🛵";
+    label = "Xe máy";
+  }
+
+  document.getElementById("route-info").innerHTML = `
+    <b>Thông tin chỉ đường:</b><br>
+    ${icon} <b>Phương tiện:</b> ${label}<br>
+    📏 <b>Quãng đường:</b> ${distanceKmValue} km<br>
+    ⏱ <b>Thời gian dự kiến:</b> ${durationText}
+  `;
+}
+
+/* ANIMATION ĐƯỜNG */
+function animateRouteLine(){
+  setTimeout(() => {
+    document.querySelectorAll(".leaflet-routing-alt-minimized, .leaflet-routing-container").forEach(el => {
+      el.style.display = "none";
+    });
+
+    const path = document.querySelector(".leaflet-overlay-pane svg path");
+    if(path){
+      path.classList.add("route-animated");
+    }
+  }, 500);
+}
+
+/* CHỈ ĐƯỜNG */
+function drawRouteToRestaurant(lat, lng){
+  if(!myLatLng){
+    alert("Bạn hãy bấm 'Vị trí tôi' trước.");
+    return;
+  }
+
+  if(routingControl){
+    map.removeControl(routingControl);
+    routingControl = null;
+  }
+
+  let profile = "driving";
+  if(currentTransportMode === "walking"){
+    profile = "walking";
+  }else if(currentTransportMode === "motorbike"){
+    profile = "driving";
+  }
+
+  routingControl = L.Routing.control({
+    waypoints: [
+      L.latLng(myLatLng.lat, myLatLng.lng),
+      L.latLng(lat, lng)
+    ],
+
+    routeWhileDragging: false,
+    addWaypoints: false,
+    draggableWaypoints: false,
+    fitSelectedRoutes: true,
+    show: false,
+
+    createMarker: function(){ return null; },
+
+    router: L.Routing.osrmv1({
+      serviceUrl: "https://router.project-osrm.org/route/v1",
+      profile: profile
+    }),
+
+    lineOptions: {
+      styles: [{
+        color: "#2196f3",
+        weight: 6,
+        opacity: 0.9
+      }]
+    }
+  }).addTo(map);
+  routingControl.on("routesfound", function(e){
+    const route = e.routes[0];
+    updateRouteInfo(route.summary);
+    animateRouteLine();
+  });
+
+  routingControl.on("routingerror", function(){
+    document.getElementById("route-info").innerHTML =
+      "<b>Thông tin chỉ đường:</b> Không tìm được tuyến đường.";
+  });
+}
+
+window.drawRouteToRestaurant = drawRouteToRestaurant;
+
+/* XÓA ĐƯỜNG */
+function clearRoute(){
+  if(routingControl){
+    map.removeControl(routingControl);
+    routingControl = null;
+  }
+  document.getElementById("route-info").innerHTML =
+"<b>Thông tin chỉ đường:</b> Chưa có tuyến đường nào.";
+}
+window.clearRoute = clearRoute;
+
+/* LOAD QUÁN ĐÃ LƯU TRONG DATABASE */
+async function loadRestaurants(){
+
   markersLayer.clearLayers();
 
   let url = "/api/restaurants.geojson";
-  const params = new URLSearchParams();
 
-  const q = document.getElementById("q").value.trim();
+  const params = new URLSearchParams();
+  const qInput = document.getElementById("searchAll");
+  const q = qInput ? qInput.value.trim() : "";
   const category = document.getElementById("category").value;
   const radius = document.getElementById("radius_km").value;
+  const onlyFavorites = document.getElementById("only_favorites").checked;
 
-  if (q) params.set("q", q);
-  if (category) params.set("category", category);
+  if(q) params.set("q", q);
+  if(category) params.set("category", category);
+  if(onlyFavorites) params.set("only_favorites", "1");
 
-  if (myLatLng && radius) {
+  if(myLatLng && radius){
     params.set("lat", myLatLng.lat);
     params.set("lng", myLatLng.lng);
     params.set("radius_km", radius);
   }
 
-  if (params.toString()) url += "?" + params.toString();
+  if(params.toString()){
+    url += "?" + params.toString();
+  }
 
   const res = await fetch(url);
   const geo = await res.json();
 
   drawRadiusCircle();
-
-  if (!geo.features || geo.features.length === 0) {
-    console.log("Không có quán nào theo bộ lọc:", url);
+  if(!geo.features || geo.features.length === 0){
+    console.log("Không có quán nào theo bộ lọc");
     return;
   }
 
@@ -300,21 +817,42 @@ async function loadRestaurants() {
     const lat = f.geometry.coordinates[1];
     const lng = f.geometry.coordinates[0];
     const p = f.properties;
-
-    const color = categoryColor(p.category);
+    const color = markerColorByAvailability(p);
     const icon = markerIcon(color);
+    const normalStatus = p.normal_available ? "Còn bàn thường" : "Hết bàn thường";
+    const vipStatus = p.vip_available ? "Còn bàn VIP" : "Hết bàn VIP";
+    const tableStatus = p.table_status || "Không rõ";
 
     let distText = "";
-    if (myLatLng) {
+    if(myLatLng){
       const d = distanceKm(myLatLng.lat, myLatLng.lng, lat, lng);
-      distText = `<br><b>Cách bạn: ${d.toFixed(2)} km</b>`;
+      distText = `<br><b>Cách bạn:</b> ${d.toFixed(2)} km`;
     }
 
+    const favLabel = p.favorited ? "💔 Bỏ yêu thích" : "❤️ Yêu thích";
+    const favClass = p.favorited ? "fav-btn active-fav" : "fav-btn";
+    const reserveUrl = `/dat-ban/?restaurant=${p.id}`;
     const popup = `
-      <b>${p.name}</b><br>
-      ${p.address || ""}<br>
-      Loại: ${p.category || "Chưa phân loại"}<br>
-      Giá: ${p.price_level ?? ""}${distText}
+
+      <div class="popup-box">
+        ${p.image_url ? `<img src="${p.image_url}" class="popup-image" alt="${p.name}">` : ""}
+        <b>${p.name}</b><br>
+        ${p.address || ""}<br>
+        <b>Loại:</b> ${p.category || "Chưa phân loại"}<br>
+        <b>Giá:</b> ${p.price_level ?? "-"}<br>
+        <p>⭐ ${p.avg_rating}/5 (${p.review_count} đánh giá)</p>
+        <b>Trạng thái:</b> ${tableStatus}<br>
+        <a href="/restaurant/${p.id}/">Xem chi tiết / đánh giá</a><br>
+        <b>Bàn thường:</b> ${normalStatus}<br>
+        <b>Bàn VIP:</b> ${vipStatus}${distText}<br>
+        <div class="popup-actions">
+          <button class="route-btn" onclick="drawRouteToRestaurant(${lat}, ${lng})">🧭 Chỉ đường</button>
+          <button class="${favClass}" onclick="toggleFavorite(${p.id}, this)">${favLabel}</button>
+          <a class="reserve-btn" href="${reserveUrl}">🍽 Đặt bàn</a>
+          <button class="delete-btn" onclick="deleteRestaurant(${p.id})">❌ Xoá</button>
+        </div>
+      </div>
+
     `;
 
     L.marker([lat, lng], { icon })
@@ -323,34 +861,279 @@ async function loadRestaurants() {
   });
 }
 
-/* ===== My location ===== */
-function getMyLocation() {
-  if (!navigator.geolocation) {
-    alert("Trình duyệt không hỗ trợ định vị.");
+/* TÌM QUÁN TRÊN OPENSTREETMAP TRONG TP.HCM */
+async function searchPlacesInHCM(){
+  const keyword = document.getElementById("searchAll").value.trim().toLowerCase();
+
+  if(!keyword){
+    alert("Nhập tên loại quán cần tìm.");
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(pos => {
-    myLatLng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+  searchLayer.clearLayers();
 
-    if (myMarker) map.removeLayer(myMarker);
+  let tags = [];
 
-    myMarker = L.marker([myLatLng.lat, myLatLng.lng])
-      .addTo(map)
-      .bindPopup("📍 Vị trí của bạn")
-      .openPopup();
+  if(keyword.includes("trà sữa") || keyword.includes("milk tea")){
+    tags = [
+      `node["amenity"="cafe"]["name"~"trà sữa|milk tea|tea|tocotoco|gong cha|koi|phúc long", i]`,
+      `way["amenity"="cafe"]["name"~"trà sữa|milk tea|tea|tocotoco|gong cha|koi|phúc long", i]`
+    ];
+  }
+  else if(keyword.includes("cafe") || keyword.includes("cà phê") || keyword.includes("coffee")){
+    tags = [
+      `node["amenity"="cafe"]`,
+      `way["amenity"="cafe"]`
+    ];
+  }
+  else if(keyword.includes("gà rán") || keyword.includes("kfc") || keyword.includes("lotteria")){
+    tags = [
+      `node["amenity"="fast_food"]["cuisine"~"chicken|fried_chicken", i]`,
+      `way["amenity"="fast_food"]["cuisine"~"chicken|fried_chicken", i]`,
+      `node["amenity"="fast_food"]["name"~"KFC|Lotteria|Texas|Jollibee", i]`,
+      `way["amenity"="fast_food"]["name"~"KFC|Lotteria|Texas|Jollibee", i]`
+    ];
+  }
+  else if(keyword.includes("đồ ăn nhanh") || keyword.includes("fast food")){
+    tags = [
+      `node["amenity"="fast_food"]`,
+      `way["amenity"="fast_food"]`
+    ];
+  }
+  else if(keyword.includes("buffet")){
+    tags = [
+      `node["amenity"="restaurant"]["name"~"buffet", i]`,
+      `way["amenity"="restaurant"]["name"~"buffet", i]`
+    ];
+  }
+  else if(keyword.includes("chay") || keyword.includes("quán ăn chay")){
+    tags = [
+      `node["amenity"="restaurant"]["name"~"chay|vegetarian|vegan", i]`,
+      `way["amenity"="restaurant"]["name"~"chay|vegetarian|vegan", i]`,
+      `node["amenity"="restaurant"]["cuisine"~"vegetarian|vegan", i]`,
+      `way["amenity"="restaurant"]["cuisine"~"vegetarian|vegan", i]`
+    ];
+  }
+  else if(keyword.includes("lẩu")){
+    tags = [
+      `node["amenity"="restaurant"]["name"~"lẩu|hotpot", i]`,
+      `way["amenity"="restaurant"]["name"~"lẩu|hotpot", i]`
+    ];
+  }
+  else if(keyword.includes("nướng")){
+    tags = [
+      `node["amenity"="restaurant"]["name"~"nướng|bbq|grill", i]`,
+      `way["amenity"="restaurant"]["name"~"nướng|bbq|grill", i]`
+    ];
+  }
+  else if(keyword.includes("cơm")){
+    tags = [
+      `node["amenity"="restaurant"]["name"~"cơm|rice", i]`,
+      `way["amenity"="restaurant"]["name"~"cơm|rice", i]`
+    ];
+  }
+  else if(keyword.includes("bánh canh") || keyword.includes("hủ tíu") || keyword.includes("hủ tiếu")){
+    tags = [
+      `node["amenity"="restaurant"]["name"~"bánh canh|hủ tíu|hủ tiếu", i]`,
+      `way["amenity"="restaurant"]["name"~"bánh canh|hủ tíu|hủ tiếu", i]`
+    ];
+  }
+  else if(keyword.includes("nhà hàng") || keyword.includes("restaurant") || keyword.includes("quán ăn")){
+    tags = [
+      `node["amenity"="restaurant"]`,
+      `way["amenity"="restaurant"]`
+    ];
+  }
+  else{
+    tags = [
+`node["amenity"="restaurant"]["name"~"${keyword}", i]`,
+      `way["amenity"="restaurant"]["name"~"${keyword}", i]`,
+      `node["amenity"="cafe"]["name"~"${keyword}", i]`,
+      `way["amenity"="cafe"]["name"~"${keyword}", i]`,
+      `node["amenity"="fast_food"]["name"~"${keyword}", i]`,
+      `way["amenity"="fast_food"]["name"~"${keyword}", i]`
+    ];
+  }
 
-    map.setView([myLatLng.lat, myLatLng.lng], 14);
-    drawRadiusCircle();
-  }, err => {
-    alert("Không lấy được vị trí: " + err.message);
-  });
+  const query = `
+    [out:json][timeout:25];
+    (
+      ${tags.map(t => `${t}(10.35,106.35,11.20,107.10);`).join("\n")}
+    );
+    out center 200;
+  `;
+
+  const url = "https://overpass.kumi.systems/api/interpreter?data=" + encodeURIComponent(query);
+
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if(!data.elements || data.elements.length === 0){
+      alert("Không tìm thấy quán phù hợp.");
+      return;
+    }
+
+    const googleLikeIcon = L.divIcon({
+      className: "",
+      html: `
+        <div style="
+          background:#e74c3c;
+          color:white;
+          width:32px;
+          height:32px;
+          border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          box-shadow:0 4px 10px rgba(0,0,0,0.25);
+          border:2px solid white;
+        ">
+          <span style="transform:rotate(45deg); font-size:16px;">🍽</span>
+        </div>
+      `,
+      iconSize:[32,32],
+      iconAnchor:[16,32],
+      popupAnchor:[0,-30]
+    });
+
+    for(const place of data.elements){
+      const lat = place.lat || place.center?.lat;
+      const lng = place.lon || place.center?.lon;
+
+      if(!lat || !lng) continue;
+
+      const name = place.tags?.name || "Chưa có tên";
+
+      const houseNumber = place.tags?.["addr:housenumber"] || "";
+      const street = place.tags?.["addr:street"] || "";
+      const ward = place.tags?.["addr:suburb"] || place.tags?.["addr:ward"] || "";
+      const district = place.tags?.["addr:district"] || "";
+      const city = place.tags?.["addr:city"] || "TP. Hồ Chí Minh";
+
+      let address = [houseNumber, street, ward, district, city]
+        .filter(Boolean)
+        .join(", ");
+
+      if(!address || address === "TP. Hồ Chí Minh"){
+        try{
+          const reverseRes = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+          );
+          const reverseData = await reverseRes.json();
+          address = reverseData.display_name || "Chưa có địa chỉ";
+        }catch(e){
+          address = "Chưa có địa chỉ";
+        }
+      }
+
+      L.marker([lat, lng], { icon: googleLikeIcon })
+        .addTo(searchLayer)
+       .bindPopup(`
+  <div class="popup-box">
+    <div class="popup-image fake-image">
+      🍽
+    </div>
+
+    <b>${name}</b><br>
+    ${address}<br>
+
+    <b>Loại:</b> ${keyword || "Quán ăn"}<br>
+    <b>Giá:</b> -<br><br>
+
+    <p>⭐ Chưa có đánh giá</p>
+
+    <b>Trạng thái:</b> Đang hoạt động<br>
+    <b>Bàn thường:</b> Chưa cập nhật<br>
+    <b>Bàn VIP:</b> Chưa cập nhật<br>
+
+    <div class="popup-actions">
+      <button class="route-btn" onclick="drawRouteToRestaurant(${lat}, ${lng})">
+        🧭 Chỉ đường
+      </button>
+
+      <button class="save-btn" onclick="saveOsmRestaurant('${name.replace(/'/g, "\\'")}', '${address.replace(/'/g, "\\'")}', ${lat}, ${lng})">
+        💾 Lưu
+      </button>
+
+      <button class="fav-btn" onclick="saveOsmRestaurant('${name.replace(/'/g, "\\'")}', '${address.replace(/'/g, "\\'")}', ${lat}, ${lng})">
+        ❤️ Yêu thích
+      </button>
+    </div>
+  </div>
+`);
+    }
+
+    map.setView([10.7769, 106.7009], 12);
+
+  }catch(e){
+    alert("Không thể tải dữ liệu quán từ OpenStreetMap.");
+  }
 }
 
-/* ===== Initial load ===== */
+/* MỞ FORM TỪ KẾT QUẢ TÌM KIẾM */
+function openAddFormAt(lat, lng, name){
+  document.getElementById("nameInput").value = name;
+  document.getElementById("latInput").value = lat;
+  document.getElementById("lngInput").value = lng;
+  document.getElementById("descriptionInput").value = "";
+  document.getElementById("addressInput").value = "Đang lấy địa chỉ...";
+
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("addressInput").value = data.display_name || "";
+    })
+
+    .catch(() => {
+      document.getElementById("addressInput").value = "";
+    });
+
+  document.getElementById("addRestaurantModal").style.display = "block";
+}
+
+/* KHỞI TẠO */
+
+document.getElementById("searchAll").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    searchPlacesInHCM();
+  }
+});
+
 loadRestaurants();
 loadStatsCategory();
-setTimeout(() => map.invalidateSize(), 300);
+
+setTimeout(() => {
+  map.invalidateSize();
+}, 300);
+
+function saveOsmRestaurant(name, address, lat, lng){
+  const formData = new FormData();
+
+  formData.append("name", name);
+  formData.append("address", address);
+  formData.append("description", "Quán được lưu từ OpenStreetMap");
+  formData.append("latitude", lat);
+  formData.append("longitude", lng);
+
+  fetch("{% url 'add_restaurant_from_map' %}", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": getCookie("csrftoken")
+    },
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      alert("Đã lưu quán vào hệ thống!");
+      loadRestaurants();
+    }else{
+      alert(data.message || "Không lưu được quán.");
+    }
+  });
+}
 </script>
 
 </body>

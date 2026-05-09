@@ -1,61 +1,557 @@
-<!doctype html>
-<html>
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-  <meta charset="utf-8"/>
-  <title>Nhân viên</title>
-  <style>
-    body{font-family:Arial;padding:16px}
-    table{border-collapse:collapse;width:100%;margin-bottom:16px}
-    td,th{border:1px solid #ddd;padding:8px}
-    select{padding:6px}
-    button{padding:6px 10px}
-  </style>
+    <meta charset="UTF-8">
+    <title>Trang nhân viên</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #fff7fb;
+            color: #5f4b57;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            border-right: 1px solid #f3d9e6;
+            padding: 24px 18px;
+            box-shadow: 4px 0 18px rgba(214, 129, 166, 0.08);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d86c9a;
+            margin-bottom: 28px;
+        }
+
+        .sidebar .section-title {
+            font-size: 12px;
+            color: #b58a9c;
+            margin: 18px 0 10px;
+            text-transform: uppercase;
+        }
+
+        .sidebar a {
+            display: block;
+            text-decoration: none;
+            color: #7a5b68;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: linear-gradient(90deg, #f8b8d0, #f49fc0);
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #d86c9a;
+        }
+
+        .topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #8a6a78;
+        }
+
+        .logout-btn {
+            text-decoration: none;
+            padding: 10px 14px;
+            background: #f6b3cb;
+            color: white;
+            border-radius: 999px;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 18px;
+            padding: 18px;
+            border: 1px solid #f4d8e4;
+            box-shadow: 0 8px 20px rgba(220, 147, 180, 0.08);
+        }
+
+        .stat-card.active {
+            background: linear-gradient(135deg, #f8a8c6, #ef7faa);
+            color: white;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: inherit;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .toolbar {
+            background: white;
+            border: 1px solid #f4d8e4;
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar input,
+        .toolbar select {
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid #efc7d7;
+            outline: none;
+            min-width: 180px;
+            background: #fffafd;
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #f3d9e6;
+            box-shadow: 0 10px 22px rgba(215, 150, 181, 0.08);
+            padding: 16px;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .table-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #dff7e8;
+            color: #289b58;
+        }
+
+        .status-reserved {
+            background: #fff1d9;
+            color: #c88a1f;
+        }
+
+        .status-occupied {
+            background: #ffdfe8;
+            color: #d2517b;
+        }
+
+        .status-cleaning {
+            background: #ece7ff;
+            color: #7b68d1;
+        }
+
+        .mini-layout {
+            width: 100%;
+            height: 110px;
+            position: relative;
+            margin: 8px 0 14px;
+        }
+
+        .table-center {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: #f9d6e4;
+            border: 2px solid #efabc4;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #b95f85;
+            font-size: 13px;
+        }
+
+        .seat {
+            width: 22px;
+            height: 12px;
+            border-radius: 8px;
+            background: #f6b7cd;
+            position: absolute;
+        }
+
+        .seat.top-left { top: 14px; left: 58px; transform: rotate(-25deg); }
+        .seat.top-right { top: 14px; right: 58px; transform: rotate(25deg); }
+        .seat.right-top { top: 40px; right: 24px; transform: rotate(90deg); }
+        .seat.right-bottom { bottom: 40px; right: 24px; transform: rotate(90deg); }
+        .seat.bottom-right { bottom: 14px; right: 58px; transform: rotate(-25deg); }
+        .seat.bottom-left { bottom: 14px; left: 58px; transform: rotate(25deg); }
+        .seat.left-bottom { bottom: 40px; left: 24px; transform: rotate(90deg); }
+        .seat.left-top { top: 40px; left: 24px; transform: rotate(90deg); }
+
+        .table-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d86c9a;
+            margin-bottom: 6px;
+        }
+
+        .meta {
+            font-size: 14px;
+            color: #8d7380;
+            margin-bottom: 4px;
+        }
+
+        .price {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ea7ea9;
+            margin: 8px 0 12px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .form-row select {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #efc7d7;
+            background: #fffafd;
+        }
+
+        .form-row button {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #f49fc0, #eb7fa9);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        html {
+          scroll-behavior: smooth;;
+        }
+        .section-box{
+          background: white;
+          border: 1px solid #f3d9e6;
+          border-radius: 18px;
+          padding: 18px;
+          margin-top: 20px;
+          box-shadow: 0 10px 22px rgba(215, 150, 181, 0.08);
+        }
+
+        .section-box h2{
+            margin-top:0;
+            color:#d86c9a;
+        }
+
+        .item-row{
+          padding: 12px 0;
+          border-bottom: 1px solid #f7dfe9;
+          color: #5f4b57;
+          margin-bottom: 1.6px;
+        }
+
+        .item-row b{
+          color: #7a4f63;
+        }
+
+        @media (max-width: 1200px) {
+            .table-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+            }
+
+            .main {
+                padding: 16px;
+            }
+
+            .table-grid,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<h2>Dashboard nhân viên - {{ restaurant.name }}</h2>
-<p><a href="/">← Về bản đồ</a> | <a href="/admin/">Admin</a></p>
+<div class="layout">
 
-<h3>Trạng thái bàn</h3>
-<table>
-  <tr>
-    <th>Bàn</th><th>Số chỗ</th><th>Trạng thái</th><th>Cập nhật</th>
-  </tr>
-  {% for t in tables %}
-  <tr>
-    <td>{{ t.code }}</td>
-    <td>{{ t.seats }}</td>
-    <td>{{ t.get_status_display }}</td>
-    <td>
-      <form method="post" action="/staff/ban/{{ t.id }}/cap-nhat/">
-        {% csrf_token %}
-        <select name="status">
-          <option value="available">Trống</option>
-          <option value="reserved">Đã đặt</option>
-          <option value="occupied">Đang phục vụ</option>
-          <option value="cleaning">Đang dọn</option>
-        </select>
-        <button type="submit">Lưu</button>
-      </form>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+    <aside class="sidebar">
+        <div class="logo">🌸 Staff Dashboard</div>
 
-<h3>Đặt bàn gần đây</h3>
-<table>
-  <tr>
-    <th>Khách</th><th>SĐT</th><th>Thời gian</th><th>Số khách</th><th>Trạng thái</th>
-  </tr>
-  {% for r in reservations %}
-  <tr>
-    <td>{{ r.customer_name }}</td>
-    <td>{{ r.customer_phone }}</td>
-    <td>{{ r.booking_time }}</td>
-    <td>{{ r.guests }}</td>
-    <td>{{ r.get_status_display }}</td>
-  </tr>
-  {% endfor %}
-</table>
+        <div class="section-title">Quản lý</div>
+        <a href="#ban-an" class="active">🍽 Trang bàn ăn</a>
+        <a href="#don-dat-ban">📝 Đơn đặt bàn</a>
+        <a href="#nha-hang">🏪 Nhà hàng</a>
+        <a href="#thong-ke">📊 Thống kê</a>
 
+        <div class="section-title">Khác</div>
+        <a href="/">🗺 Về bản đồ</a>
+        <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <h1>Quản lý bàn ăn</h1>
+                <div style="color:#9a7d89; margin-top:6px;">
+                        Tổng quan về tình trạng bàn ăn trong hệ thống
+                </div>
+            </div>
+            <div class="right">
+                👤 {{ request.user.username }}
+                <a href="{% url 'logout' %}" class="logout-btn">Đăng xuất</a>
+            </div>
+        </div>
+
+        <section class="stats" id="thong-ke">
+            <div class="stat-card active">
+                <div class="stat-title">Tổng số bàn</div>
+            <div class="stat-value">{{ total_tables }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Đang phục vụ</div>
+                <div class="stat-value">{{ occupied }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Đã đặt trước</div>
+                <div class="stat-value">{{ reserved }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Bàn VIP</div>
+                <div class="stat-value">{{ vip_tables }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Bàn thường</div>
+                <div class="stat-value">{{ normal_tables }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Đang dọn dẹp</div>
+                <div class="stat-value">{{ cleaning }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Còn trống</div>
+                <div class="stat-value">{{ available }}</div>
+            </div>
+        </section>
+
+        <section class="toolbar">
+            <input type="text" placeholder="Tìm mã bàn hoặc tên quán...">
+            <select>
+                <option>Tất cả trạng thái</option>
+                <option>Còn trống</option>
+                <option>Đã đặt</option>
+                <option>Đang phục vụ</option>
+                <option>Đang dọn dẹp</option>
+            </select>
+            <select>
+                <option>Tất cả loại bàn</option>
+                <option>Bàn VIP</option>
+                <option>Bàn thường</option>
+            </select>
+        </section>
+
+        <section class="table-grid" id="ban-an">
+            {% for table in tables %}
+                <div class="table-card">
+                    {% if table.status == "available" %}
+                        <div class="status-badge status-available">Còn trống</div>
+                    {% elif table.status == "reserved" %}
+                        <div class="status-badge status-reserved">Đã đặt</div>
+                    {% elif table.status == "occupied" %}
+                        <div class="status-badge status-occupied">Đang phục vụ</div>
+                    {% elif table.status == "cleaning" %}
+                        <div class="status-badge status-cleaning">Đang dọn dẹp</div>
+                    {% endif %}
+
+                    <div class="mini-layout">
+                        <div class="seat top-left"></div>
+                        <div class="seat top-right"></div>
+                        <div class="seat right-top"></div>
+                        <div class="seat right-bottom"></div>
+                        <div class="seat bottom-right"></div>
+                        <div class="seat bottom-left"></div>
+                        <div class="seat left-bottom"></div>
+                        <div class="seat left-top"></div>
+
+                        <div class="table-center">{{ table.code }}</div>
+                    </div>
+
+                    <div class="table-name">{{ table.code }}</div>
+                    <div class="meta">Loại bàn: {{ table.get_table_type_display }}</div>
+                    <div class="meta">Sức chứa: {{ table.capacity }} người</div>
+                    <div class="meta">Nhà hàng: {{ table.restaurant.name }}</div>
+                    <div class="price">
+                        {% if table.table_type == "vip" %}
+                            Bàn VIP
+                        {% else %}
+                            Bàn thường
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" action="{% url 'update_table_status' table.id %}">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <select name="status">
+                                <option value="available" {% if table.status == "available" %}selected{% endif %}>Còn trống</option>
+                                <option value="reserved" {% if table.status == "reserved" %}selected{% endif %}>Đã đặt</option>
+                                <option value="occupied" {% if table.status == "occupied" %}selected{% endif %}>Đang phục vụ</option>
+                                <option value="cleaning" {% if table.status == "cleaning" %}selected{% endif %}>Đang dọn dẹp</option>
+                            </select>
+                            <button type="submit">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+               {% endfor %}
+        </section>
+
+        <section class="section-box" id="don-cho-xu-ly">
+            <h2>Đơn chờ xử lý</h2>
+
+            {% for r in pending_reservations %}
+                <div class="item-row">
+                     <b>{{ r.customer_name }}</b> - {{ r.restaurant.name }}<br>
+                     SĐT: {{ r.customer_phone }}<br>
+                     Số khách: {{ r.guests }} |
+                     Loại bàn: {{ r.get_booking_type_display }} |
+                     Thời gian: {{ r.booking_time|date:"d/m/Y H:i" }}
+                 </div>
+            {% empty %}
+                <div>Không có đơn chờ xử lý.</div>
+            {% endfor %}
+        </section>
+
+        <section class="section-box" id="thong-ke-nha-hang">
+            <h2>Thống kê theo nhà hàng</h2>
+
+            {% for r in restaurant_stats %}
+               <div class="item-row">
+                   <b>{{ r.name }}</b><br>
+                   Tổng bàn: {{ r.total_tables }} |
+                   Còn trống: {{ r.available }} |
+                   Đã đặt: {{ r.reserved }} |
+                   Đang phục vụ: {{ r.occupied }} |
+                   Đang dọn dẹp: {{ r.cleaning }}
+               </div>
+            {% empty %}
+              <div>Không có dữ liệu nhà hàng.</div>
+            {% endfor %}
+        </section>
+
+        <section class="section-box" id="thong-bao-moi">
+            <h2>Thông báo mới</h2>
+
+            {% for note in notifications %}
+               <div class="item-row">
+                    {{ note }}
+               </div>
+            {% empty %}
+               <div>Chưa có thông báo mới.</div>
+            {% endfor %}
+        </section>
+
+        <section id="don-dat-ban" class="section-box">
+          <h2>Đơn đặt bàn</h2>
+
+          {% for r in reservations %}
+              <div style="padding:12px 0; border-bottom:1px solid #f3d9e6;">
+                   <b>Khách:</b> {{ r.customer_name }}<br>
+                   <b>Nhà hàng:</b> {{ r.restaurant.name }}<br>
+                   <b>SĐT:</b> {{ r.customer_phone }}<br>
+                   <b>Số khách:</b> {{ r.guests }}<br>
+                   <b>Loại bàn:</b> {{ r.get_booking_type_display }}<br>
+                   <b>Thời gian:</b> {{ r.booking_time|date:"d/m/Y H:i" }}<br>
+                   <b>Trạng thái:</b> {{ r.status }}
+              </div>
+          {% empty %}
+              <div>Không có đơn đặt bàn nào.</div>
+          {% endfor %}
+        </section>
+
+        <section id="nha-hang" class="section-box">
+          <h2>Nhà hàng</h2>
+
+          {% for r in restaurants %}
+              <div style="padding:12px 0; border-bottom:1px solid #f3d9e6;">
+                   <b>{{ r.name }}</b><br>
+                   Địa chỉ: {{ r.address }}<br>
+                   SĐT: {{ r.phone }}<br>
+                   Loại: {% if r.category %}{{ r.category.name }}{% else %}Chưa phân loại{% endif %}
+              </div>
+          {% empty %}
+              <div>Không có dữ liệu nhà hàng.</div>
+          {% endfor %}
+        </section>
+       
+    </main>
+</div>
 </body>
 </html>

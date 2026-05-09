@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ restaurant.name }}</title>
+    <style>
+        body{
+            font-family:Arial,sans-serif;
+            background:#fff7fb;
+            margin:0;
+            padding:30px;
+            color:#5d4953;
+        }
+
+        .container{
+            max-width:900px;
+            margin:auto;
+        }
+
+        .card{
+            background:white;
+            border:1px solid #f0d7e2;
+            border-radius:22px;
+            padding:24px;
+            margin-bottom:20px;
+            box-shadow:0 10px 24px rgba(215,150,181,0.08);
+        }
+
+        h1,h2{
+            color:#b85f86;
+        }
+
+        .muted{
+            color:#8c7280;
+            line-height:1.6;
+        }
+
+        .rating{
+            font-size:18px;
+            font-weight:bold;
+            color:#d46a8e;
+            margin:10px 0;
+        }
+
+        textarea, select{
+            width:100%;
+            padding:12px;
+            border-radius:14px;
+            border:1px solid #efc6d6;
+            margin-top:8px;
+            margin-bottom:14px;
+            font-size:15px;
+            box-sizing:border-box;
+        }
+
+        button{
+            border:none;
+            background:#d46a8e;
+            color:white;
+            padding:12px 18px;
+            border-radius:999px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        .review-item{
+            padding:14px 0;
+            border-bottom:1px solid #f4dce6;
+        }
+
+        .review-item:last-child{
+            border-bottom:none;
+        }
+
+        .stars{
+            color:#e48ab1;
+            font-weight:bold;
+            margin:6px 0;
+        }
+
+        .back{
+            display:inline-block;
+            margin-bottom:16px;
+            text-decoration:none;
+            color:#b85f86;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/map/" class="back">← Về bản đồ</a>
+
+    <div class="card">
+        <h1>{{ restaurant.name }}</h1>
+        <div class="muted">{{ restaurant.address }}</div>
+        <div class="muted">SĐT: {{ restaurant.phone }}</div>
+        <div class="rating">Điểm trung bình: {{ avg_rating }}/5</div>
+    </div>
+
+    <div class="card">
+        <h2>Đánh giá quán ăn</h2>
+
+        {% if request.user.is_authenticated %}
+    {% if has_booked %}
+        <form method="POST" action="{% url 'add_review' restaurant.id %}">
+            {% csrf_token %}
+
+            <label>Số sao</label>
+            <select name="rating">
+                <option value="5" {% if user_review and user_review.rating == 5 %}selected{% endif %}>5 sao</option>
+                <option value="4" {% if user_review and user_review.rating == 4 %}selected{% endif %}>4 sao</option>
+                <option value="3" {% if user_review and user_review.rating == 3 %}selected{% endif %}>3 sao</option>
+                <option value="2" {% if user_review and user_review.rating == 2 %}selected{% endif %}>2 sao</option>
+                <option value="1" {% if user_review and user_review.rating == 1 %}selected{% endif %}>1 sao</option>
+            </select>
+
+            <label>Nhận xét</label>
+            <textarea name="comment" rows="4">{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+
+            <button type="submit">Gửi đánh giá</button>
+            {% if user_review %}
+    <a href="{% url 'delete_review' restaurant.id %}"
+       style="display:inline-block; margin-top:10px; color:#b85f86; font-weight:bold;">
+        Xóa đánh giá của tôi
+    </a>
+{% endif %}
+
+        </form>
+    {% else %}
+        <div class="muted">Bạn cần có đơn đặt bàn đã được duyệt mới có thể đánh giá quán này.</div>
+    {% endif %}
+{% else %}
+    <div class="muted">Bạn cần đăng nhập để đánh giá quán ăn.</div>
+{% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Nhận xét từ khách hàng</h2>
+
+        {% for review in reviews %}
+            <div class="review-item">
+                <strong>{{ review.user.username }}</strong>
+                <div class="stars">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                </div>
+                <div class="muted">{{ review.comment|default:"Không có nhận xét." }}</div>
+                <div class="muted">{{ review.created_at|date:"d/m/Y H:i" }}</div>
+            </div>
+        {% empty %}
+            <div class="muted">Chưa có đánh giá nào cho quán này.</div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

@@ -16,11 +16,28 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+from core import views
+from django.contrib.auth.views import LogoutView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path("", include("core.urls")),
-    path("accounts/", include("django.contrib.auth.urls")),
+    #login#
+    path("login/admin/", views.admin_login_view, name="admin_login"),
+    path("login/user/", views.user_login_view, name="user_login"),
+    path("register/", views.register_view, name="register"),
+    path("logout/", views.logout_view, name="logout"),
+    path('logout/', LogoutView.as_view(next_page='user_login'), name='logout'),
+    path('staff/login', views.staff_login_view, name='staff_login'),
+    path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
+    path('dashboard/hang-hoa/', views.hang_hoa, name='hang_hoa'),
+    path('map/add-restaurant/', views.add_restaurant_from_map, name='add_restaurant_from_map'),
+    path('map/delete-restaurant/<int:id>/', views.delete_restaurant, name='delete_restaurant'),
+    #dashboard riêng#
+    path("dashboard/admin/", views.admin_dashboard, name="admin_dashboard"),
+    path("profile/", views.profile, name="profile"),
 ]
 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
