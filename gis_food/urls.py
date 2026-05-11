@@ -37,6 +37,7 @@ urlpatterns = [
     #dashboard riêng#
     path("dashboard/admin/", views.admin_dashboard, name="admin_dashboard"),
     path("profile/", views.profile, name="profile"),
+    
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
